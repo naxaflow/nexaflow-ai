@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Nexaflow Diagnóstico</title>
+<style>
+body{
+font-family: Arial;
+background:#0f172a;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
+.container{
+background:#1e293b;
+padding:40px;
+border-radius:10px;
+width:400px;
+}
+input,textarea,button{
+width:100%;
+margin-top:10px;
+padding:10px;
+border-radius:6px;
+border:none;
+}
+button{
+background:#22c55e;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Diagnóstico de Contenido</h2>
+
+<input id="nicho" placeholder="¿Cuál es tu nicho?">
+
+<input id="audiencia" placeholder="¿A quién quieres ayudar?">
+
+<textarea id="problema" placeholder="¿Cuál es el problema principal de tu audiencia?"></textarea>
+
+<button onclick="generar()">Generar ideas</button>
+
+<div id="resultado" style="margin-top:20px;"></div>
+
+</div>
+
+<script>
+
+async function generar(){
+
+const nicho = document.getElementById("nicho").value
+const audiencia = document.getElementById("audiencia").value
+const problema = document.getElementById("problema").value
+
+document.getElementById("resultado").innerHTML="Generando ideas..."
+
+const respuesta = await fetch("https://api.anthropic.com/v1/messages",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"x-api-key":"TU_API_KEY_AQUI",
+"anthropic-version":"2023-06-01"
+},
+body:JSON.stringify({
+model:"claude-3-haiku-20240307",
+max_tokens:300,
+messages:[
+{
+role:"user",
+content:`Actúa como experto en marketing digital.
+
+Nicho: ${nicho}
+Audiencia: ${audiencia}
+Problema: ${problema}
+
+Dame:
+
+1 diagnóstico
+3 ideas de contenido viral`
+}
+]
+})
+})
+
+const data = await respuesta.json()
+
+document.getElementById("resultado").innerHTML = data.content[0].text
+
+}
+
+</script>
+
+</body>
+</html>
