@@ -1,147 +1,438 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
 <meta charset="UTF-8">
-<title>Nexaflow Diagnóstico</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXAFLOW AI — Diagnóstico de Contenido</title>
 <style>
-
+*{box-sizing:border-box;margin:0;padding:0;}
 body{
-font-family: Arial;
-background:#0f172a;
-color:white;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-margin:0;
+  font-family:Arial,sans-serif;
+  background:#0D1B2A;
+  color:white;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:20px;
 }
-
 .container{
-background:#1e293b;
-padding:40px;
-border-radius:10px;
-width:420px;
-box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  background:#1e293b;
+  padding:32px 28px;
+  border-radius:16px;
+  width:100%;
+  max-width:480px;
+  margin:20px auto;
+  box-shadow:0 10px 40px rgba(0,0,0,0.5);
 }
-
-h2{
-text-align:center;
-margin-bottom:20px;
+.logo{
+  text-align:center;
+  margin-bottom:8px;
 }
-
+.logo h1{
+  font-size:22px;
+  font-weight:900;
+  color:#60A5FA;
+  letter-spacing:2px;
+}
+.logo p{
+  font-size:13px;
+  color:#94A3B8;
+  margin-top:4px;
+}
+.progress{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:6px;
+  margin:20px 0;
+}
+.step-dot{
+  width:10px;height:10px;
+  border-radius:50%;
+  background:#334155;
+  transition:all 0.3s;
+}
+.step-dot.active{background:#2563EB;}
+.step-dot.done{background:#0F766E;}
+.pregunta{display:none;}
+.pregunta.activa{display:block;}
+.pregunta h2{
+  font-size:17px;
+  font-weight:700;
+  color:#E2E8F0;
+  margin-bottom:6px;
+  line-height:1.4;
+}
+.pregunta p{
+  font-size:13px;
+  color:#94A3B8;
+  margin-bottom:16px;
+}
 input, textarea{
-width:100%;
-margin-top:10px;
-padding:12px;
-border-radius:6px;
-border:none;
-font-size:14px;
+  width:100%;
+  padding:14px;
+  border-radius:10px;
+  border:2px solid #334155;
+  background:#0f172a;
+  color:white;
+  font-size:15px;
+  outline:none;
+  transition:border 0.2s;
+  resize:none;
 }
-
-button{
-width:100%;
-margin-top:15px;
-padding:12px;
-border-radius:6px;
-border:none;
-background:#22c55e;
-color:white;
-font-weight:bold;
-font-size:15px;
-cursor:pointer;
+input:focus, textarea:focus{border-color:#2563EB;}
+.opciones{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:4px;
 }
-
-button:hover{
-background:#16a34a;
+.opcion{
+  padding:10px 16px;
+  border-radius:20px;
+  border:2px solid #334155;
+  background:transparent;
+  color:#CBD5E1;
+  font-size:14px;
+  cursor:pointer;
+  transition:all 0.2s;
 }
-
-#resultado{
-margin-top:20px;
-white-space:pre-line;
-line-height:1.5;
-background:#0f172a;
-padding:15px;
-border-radius:6px;
+.opcion:hover{border-color:#2563EB;color:white;}
+.opcion.selected{
+  border-color:#2563EB;
+  background:#1B3A6B;
+  color:white;
+  font-weight:bold;
 }
-
+.btn-siguiente{
+  width:100%;
+  margin-top:20px;
+  padding:14px;
+  border-radius:10px;
+  border:none;
+  background:#2563EB;
+  color:white;
+  font-weight:bold;
+  font-size:16px;
+  cursor:pointer;
+  transition:background 0.2s;
+}
+.btn-siguiente:hover{background:#1B3A6B;}
+.btn-siguiente:disabled{background:#334155;cursor:not-allowed;}
+.cargando{
+  text-align:center;
+  padding:40px 0;
+  display:none;
+}
+.cargando p{
+  color:#94A3B8;
+  font-size:14px;
+  margin-top:16px;
+}
+.spinner{
+  width:40px;height:40px;
+  border:4px solid #334155;
+  border-top:4px solid #2563EB;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+  margin:0 auto;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.resultado{
+  display:none;
+  margin-top:8px;
+}
+.resultado-texto{
+  background:#0f172a;
+  padding:20px;
+  border-radius:10px;
+  white-space:pre-line;
+  line-height:1.7;
+  font-size:14px;
+  color:#E2E8F0;
+  border:1px solid #1B3A6B;
+}
+.btn-copiar{
+  width:100%;
+  margin-top:12px;
+  padding:14px;
+  border-radius:10px;
+  border:2px solid #0F766E;
+  background:transparent;
+  color:#0F766E;
+  font-weight:bold;
+  font-size:15px;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.btn-copiar:hover{background:#0F766E;color:white;}
+.btn-lista{
+  width:100%;
+  margin-top:10px;
+  padding:14px;
+  border-radius:10px;
+  border:none;
+  background:#B45309;
+  color:white;
+  font-weight:bold;
+  font-size:15px;
+  cursor:pointer;
+  transition:background 0.2s;
+}
+.btn-lista:hover{background:#92400E;}
+.btn-nueva{
+  width:100%;
+  margin-top:10px;
+  padding:12px;
+  border-radius:10px;
+  border:2px solid #334155;
+  background:transparent;
+  color:#94A3B8;
+  font-size:14px;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.btn-nueva:hover{border-color:#94A3B8;color:white;}
+.contador{
+  font-size:12px;
+  color:#64748B;
+  text-align:right;
+  margin-top:4px;
+}
 </style>
-
 </head>
-
 <body>
-
 <div class="container">
 
-<h2>Diagnóstico de Contenido</h2>
+  <div class="logo">
+    <h1>NEXAFLOW AI</h1>
+    <p>Tu sistema de contenido con IA</p>
+  </div>
 
-<input id="nicho" placeholder="¿Cuál es tu nicho?">
+  <div class="progress" id="progress"></div>
 
-<input id="audiencia" placeholder="¿A quién quieres ayudar?">
+  <!-- P1 -->
+  <div class="pregunta activa" id="p1">
+    <h2>¿En qué tema o industria creas contenido?</h2>
+    <p>Sé específico. Ej: marketing digital, fitness, finanzas personales, cocina vegana...</p>
+    <input type="text" id="nicho" placeholder="Escribe tu nicho aquí" oninput="verificarInput('nicho','btn1')">
+    <button class="btn-siguiente" id="btn1" onclick="siguiente(2)" disabled>Continuar →</button>
+  </div>
 
-<textarea id="problema" rows="3" placeholder="¿Cuál es el problema principal de tu audiencia?"></textarea>
+  <!-- P2 -->
+  <div class="pregunta" id="p2">
+    <h2>¿A quién le hablas con ese contenido?</h2>
+    <p>Descríbeme a tu seguidor ideal — quién es, qué le preocupa, qué quiere lograr.</p>
+    <textarea id="audiencia" rows="3" placeholder="Ej: Mujeres de 30 años que quieren bajar de peso pero no tienen tiempo..." oninput="verificarInput('audiencia','btn2')"></textarea>
+    <button class="btn-siguiente" id="btn2" onclick="siguiente(3)" disabled>Continuar →</button>
+  </div>
 
-<button onclick="generar()">Generar ideas</button>
+  <!-- P3 -->
+  <div class="pregunta" id="p3">
+    <h2>¿Qué edad tiene aproximadamente esa audiencia?</h2>
+    <p>Selecciona el rango que mejor describe a tu público objetivo.</p>
+    <div class="opciones" id="ops3">
+      <button class="opcion" onclick="seleccionar('edad_audiencia',this,'18-24','btn3')">18-24</button>
+      <button class="opcion" onclick="seleccionar('edad_audiencia',this,'25-34','btn3')">25-34</button>
+      <button class="opcion" onclick="seleccionar('edad_audiencia',this,'35-44','btn3')">35-44</button>
+      <button class="opcion" onclick="seleccionar('edad_audiencia',this,'45-54','btn3')">45-54</button>
+      <button class="opcion" onclick="seleccionar('edad_audiencia',this,'55+','btn3')">55+</button>
+      <button class="opcion" onclick="seleccionar('edad_audiencia',this,'Varias edades','btn3')">Varias edades</button>
+    </div>
+    <button class="btn-siguiente" id="btn3" onclick="siguiente(4)" disabled>Continuar →</button>
+  </div>
 
-<div id="resultado"></div>
+  <!-- P4 -->
+  <div class="pregunta" id="p4">
+    <h2>¿En qué plataforma publicas principalmente?</h2>
+    <p>Donde está tu audiencia ahora mismo.</p>
+    <div class="opciones" id="ops4">
+      <button class="opcion" onclick="seleccionar('plataforma',this,'Instagram','btn4')">📱 Instagram</button>
+      <button class="opcion" onclick="seleccionar('plataforma',this,'TikTok','btn4')">🎵 TikTok</button>
+      <button class="opcion" onclick="seleccionar('plataforma',this,'YouTube','btn4')">▶️ YouTube</button>
+      <button class="opcion" onclick="seleccionar('plataforma',this,'LinkedIn','btn4')">💼 LinkedIn</button>
+      <button class="opcion" onclick="seleccionar('plataforma',this,'Facebook','btn4')">📘 Facebook</button>
+      <button class="opcion" onclick="seleccionar('plataforma',this,'Otra','btn4')">✍️ Otra</button>
+    </div>
+    <button class="btn-siguiente" id="btn4" onclick="siguiente(5)" disabled>Continuar →</button>
+  </div>
+
+  <!-- P5 -->
+  <div class="pregunta" id="p5">
+    <h2>¿Qué quieres lograr con tu contenido?</h2>
+    <p>Tu objetivo principal define el tipo de contenido que genera más resultados.</p>
+    <div class="opciones" id="ops5">
+      <button class="opcion" onclick="seleccionar('objetivo',this,'Atraer clientes','btn5')">🎯 Atraer clientes</button>
+      <button class="opcion" onclick="seleccionar('objetivo',this,'Posicionarme como referente','btn5')">🏆 Posicionarme</button>
+      <button class="opcion" onclick="seleccionar('objetivo',this,'Vender algo específico','btn5')">💰 Vender</button>
+      <button class="opcion" onclick="seleccionar('objetivo',this,'Construir comunidad','btn5')">👥 Comunidad</button>
+      <button class="opcion" onclick="seleccionar('objetivo',this,'Todo lo anterior','btn5')">🔄 Todo</button>
+    </div>
+    <button class="btn-siguiente" id="btn5" onclick="siguiente(6)" disabled>Continuar →</button>
+  </div>
+
+  <!-- P6 -->
+  <div class="pregunta" id="p6">
+    <h2>¿Cuál es tu mayor problema al crear contenido hoy?</h2>
+    <p>Sin filtro. Esta es la pregunta más importante.</p>
+    <textarea id="friccion" rows="3" placeholder="Ej: No sé qué decir, me bloqueo, no tengo tiempo, no sé qué funciona..." oninput="verificarInput('friccion','btn6')"></textarea>
+    <button class="btn-siguiente" id="btn6" onclick="siguiente(7)" disabled>Continuar →</button>
+  </div>
+
+  <!-- P7 -->
+  <div class="pregunta" id="p7">
+    <h2>¿Hay un tema específico para esta semana?</h2>
+    <p>Si no tienes uno, dime el tema del que más te gusta hablar.</p>
+    <textarea id="tema" rows="3" placeholder="Ej: Cómo empezar a invertir con poco dinero / El tema que más domino es..." oninput="verificarInput('tema','btn7')"></textarea>
+    <button class="btn-siguiente" id="btn7" onclick="siguiente(8)" disabled>Continuar →</button>
+  </div>
+
+  <!-- P8 -->
+  <div class="pregunta" id="p8">
+    <h2>¿Cómo prefieres aparecer en tu contenido?</h2>
+    <p>Esto define qué formatos te recomienda el sistema.</p>
+    <div class="opciones" id="ops8">
+      <button class="opcion" onclick="seleccionar('presencia',this,'Con mi rostro y voz','btn8')">🎥 Con mi rostro</button>
+      <button class="opcion" onclick="seleccionar('presencia',this,'Solo mi voz sin cámara','btn8')">🎙️ Solo mi voz</button>
+      <button class="opcion" onclick="seleccionar('presencia',this,'Sin aparecer — solo texto y diseño','btn8')">✍️ Sin aparecer</button>
+      <button class="opcion" onclick="seleccionar('presencia',this,'Con avatar o personaje digital','btn8')">🤖 Con avatar</button>
+      <button class="opcion" onclick="seleccionar('presencia',this,'Depende del contenido','btn8')">🔄 Depende</button>
+    </div>
+    <button class="btn-siguiente" id="btn8" onclick="generar()" disabled>✨ Generar mis ideas</button>
+  </div>
+
+  <!-- CARGANDO -->
+  <div class="cargando" id="cargando">
+    <div class="spinner"></div>
+    <p id="msg-carga">Analizando tu perfil...</p>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="resultado" id="resultado">
+    <div class="resultado-texto" id="texto-resultado"></div>
+    <button class="btn-copiar" onclick="copiar()">📋 Copiar todo</button>
+    <button class="btn-lista" onclick="window.open('https://forms.gle/TU_LINK_AQUI','_blank')">🚀 Quiero acceso anticipado a NEXAFLOW</button>
+    <button class="btn-nueva" onclick="reiniciar()">↩ Generar con otra idea</button>
+  </div>
 
 </div>
 
 <script>
+const datos = {}
+const total = 8
+let actual = 1
+
+function buildProgress(){
+  const p = document.getElementById('progress')
+  p.innerHTML = ''
+  for(let i=1;i<=total;i++){
+    const d = document.createElement('div')
+    d.className = 'step-dot' + (i<actual?' done':i===actual?' active':'')
+    p.appendChild(d)
+  }
+}
+
+function siguiente(n){
+  document.getElementById('p'+actual).classList.remove('activa')
+  actual = n
+  document.getElementById('p'+actual).classList.add('activa')
+  buildProgress()
+  window.scrollTo({top:0,behavior:'smooth'})
+}
+
+function seleccionar(campo, btn, valor, btnId){
+  const parent = btn.parentElement
+  parent.querySelectorAll('.opcion').forEach(b=>b.classList.remove('selected'))
+  btn.classList.add('selected')
+  datos[campo] = valor
+  document.getElementById(btnId).disabled = false
+}
+
+function verificarInput(campo, btnId){
+  const val = document.getElementById(campo).value.trim()
+  datos[campo] = val
+  document.getElementById(btnId).disabled = val.length < 3
+}
+
+const mensajes = [
+  'Analizando tu perfil...',
+  'Identificando patrones virales...',
+  'Adaptando el tono para tu audiencia...',
+  'Construyendo tus ideas...',
+  'Casi listo...'
+]
 
 async function generar(){
+  document.getElementById('p8').classList.remove('activa')
+  document.getElementById('cargando').style.display = 'block'
+  document.getElementById('resultado').style.display = 'none'
+  buildProgress()
 
-const nicho = document.getElementById("nicho").value
-const audiencia = document.getElementById("audiencia").value
-const problema = document.getElementById("problema").value
+  let mi = 0
+  const interval = setInterval(()=>{
+    document.getElementById('msg-carga').textContent = mensajes[mi%mensajes.length]
+    mi++
+  },2000)
 
-document.getElementById("resultado").innerHTML = "Generando ideas..."
-
-try{
-
-const respuesta = await fetch("/api/diagnostico",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-nicho,
-audiencia,
-problema
-})
-})
-
-const data = await respuesta.json()
-
-if(data.resultado){
-
-document.getElementById("resultado").innerHTML = data.resultado
-
-}else if(data.error){
-
-if(typeof data.error === "object"){
-document.getElementById("resultado").innerHTML = JSON.stringify(data.error,null,2)
-}else{
-document.getElementById("resultado").innerHTML = data.error
+  try{
+    const res = await fetch('/api/diagnostico',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        nicho: datos.nicho || '',
+        audiencia: datos.audiencia || '',
+        edad_audiencia: datos.edad_audiencia || '',
+        plataforma: datos.plataforma || '',
+        objetivo: datos.objetivo || '',
+        friccion: datos.friccion || '',
+        tema: datos.tema || '',
+        presencia: datos.presencia || ''
+      })
+    })
+    const d = await res.json()
+    clearInterval(interval)
+    document.getElementById('cargando').style.display = 'none'
+    document.getElementById('resultado').style.display = 'block'
+    if(d.resultado){
+      document.getElementById('texto-resultado').textContent = d.resultado
+    } else {
+      document.getElementById('texto-resultado').textContent = 'Error: ' + JSON.stringify(d.error)
+    }
+  }catch(e){
+    clearInterval(interval)
+    document.getElementById('cargando').style.display = 'none'
+    document.getElementById('resultado').style.display = 'block'
+    document.getElementById('texto-resultado').textContent = 'Error de conexión. Intenta de nuevo.'
+  }
 }
 
-}else{
-
-document.getElementById("resultado").innerHTML = "No hubo respuesta"
-
+function copiar(){
+  const texto = document.getElementById('texto-resultado').textContent
+  navigator.clipboard.writeText(texto).then(()=>{
+    const btn = document.querySelector('.btn-copiar')
+    btn.textContent = '✅ ¡Copiado!'
+    setTimeout(()=>btn.textContent='📋 Copiar todo',2000)
+  })
 }
 
-}catch(error){
-
-document.getElementById("resultado").innerHTML = "Error de conexión con el servidor"
-
+function reiniciar(){
+  Object.keys(datos).forEach(k=>delete datos[k])
+  actual = 1
+  document.getElementById('resultado').style.display = 'none'
+  document.querySelectorAll('.pregunta').forEach(p=>p.classList.remove('activa'))
+  document.querySelectorAll('.opcion').forEach(b=>b.classList.remove('selected'))
+  document.querySelectorAll('.btn-siguiente').forEach(b=>b.disabled=true)
+  document.getElementById('nicho').value=''
+  document.getElementById('audiencia').value=''
+  document.getElementById('friccion').value=''
+  document.getElementById('tema').value=''
+  document.getElementById('p1').classList.add('activa')
+  buildProgress()
+  window.scrollTo({top:0,behavior:'smooth'})
 }
 
-}
-
+buildProgress()
 </script>
-
 </body>
 </html>
