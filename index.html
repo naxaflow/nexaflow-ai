@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>Nexaflow Diagnóstico</title>
+
 <style>
+
 body{
 font-family: Arial;
 background:#0f172a;
@@ -14,12 +16,14 @@ align-items:center;
 height:100vh;
 margin:0;
 }
+
 .container{
 background:#1e293b;
 padding:40px;
 border-radius:10px;
 width:400px;
 }
+
 input,textarea,button{
 width:100%;
 margin-top:10px;
@@ -27,13 +31,26 @@ padding:10px;
 border-radius:6px;
 border:none;
 }
+
 button{
 background:#22c55e;
 color:white;
 font-weight:bold;
 cursor:pointer;
 }
+
+button:hover{
+background:#16a34a;
+}
+
+#resultado{
+margin-top:20px;
+white-space:pre-line;
+line-height:1.5;
+}
+
 </style>
+
 </head>
 
 <body>
@@ -50,7 +67,7 @@ cursor:pointer;
 
 <button onclick="generar()">Generar ideas</button>
 
-<div id="resultado" style="margin-top:20px;"></div>
+<div id="resultado"></div>
 
 </div>
 
@@ -64,37 +81,37 @@ const problema = document.getElementById("problema").value
 
 document.getElementById("resultado").innerHTML="Generando ideas..."
 
-const respuesta = await fetch("https://api.anthropic.com/v1/messages",{
+try{
+
+const respuesta = await fetch("/api/diagnostico",{
 method:"POST",
 headers:{
-"Content-Type":"application/json",
-"x-api-key":"TU_API_KEY_AQUI",
-"anthropic-version":"2023-06-01"
+"Content-Type":"application/json"
 },
 body:JSON.stringify({
-model:"claude-3-haiku-20240307",
-max_tokens:300,
-messages:[
-{
-role:"user",
-content:`Actúa como experto en marketing digital.
-
-Nicho: ${nicho}
-Audiencia: ${audiencia}
-Problema: ${problema}
-
-Dame:
-
-1 diagnóstico
-3 ideas de contenido viral`
-}
-]
+nicho,
+audiencia,
+problema
 })
 })
 
 const data = await respuesta.json()
 
-document.getElementById("resultado").innerHTML = data.content[0].text
+if(data.resultado){
+
+document.getElementById("resultado").innerHTML = data.resultado
+
+}else{
+
+document.getElementById("resultado").innerHTML = "Error: " + (data.error || "No hubo respuesta")
+
+}
+
+}catch(error){
+
+document.getElementById("resultado").innerHTML = "Error de conexión con el servidor"
+
+}
 
 }
 
