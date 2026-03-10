@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
 <meta charset="UTF-8">
 <title>Nexaflow Diagnóstico</title>
 
@@ -21,28 +23,48 @@ margin:0;
 background:#1e293b;
 padding:40px;
 border-radius:10px;
-width:400px;
+width:420px;
+box-shadow:0 10px 30px rgba(0,0,0,0.4);
 }
 
-input,textarea,button{
+h2{
+text-align:center;
+margin-bottom:20px;
+}
+
+input, textarea{
 width:100%;
 margin-top:10px;
-padding:10px;
+padding:12px;
 border-radius:6px;
 border:none;
+font-size:14px;
 }
 
 button{
+width:100%;
+margin-top:15px;
+padding:12px;
+border-radius:6px;
+border:none;
 background:#22c55e;
 color:white;
 font-weight:bold;
+font-size:15px;
 cursor:pointer;
+}
+
+button:hover{
+background:#16a34a;
 }
 
 #resultado{
 margin-top:20px;
 white-space:pre-line;
 line-height:1.5;
+background:#0f172a;
+padding:15px;
+border-radius:6px;
 }
 
 </style>
@@ -59,7 +81,7 @@ line-height:1.5;
 
 <input id="audiencia" placeholder="¿A quién quieres ayudar?">
 
-<textarea id="problema" placeholder="¿Cuál es el problema principal de tu audiencia?"></textarea>
+<textarea id="problema" rows="3" placeholder="¿Cuál es el problema principal de tu audiencia?"></textarea>
 
 <button onclick="generar()">Generar ideas</button>
 
@@ -75,7 +97,7 @@ const nicho = document.getElementById("nicho").value
 const audiencia = document.getElementById("audiencia").value
 const problema = document.getElementById("problema").value
 
-document.getElementById("resultado").innerHTML="Generando ideas..."
+document.getElementById("resultado").innerHTML = "Generando ideas..."
 
 try{
 
@@ -94,9 +116,21 @@ problema
 const data = await respuesta.json()
 
 if(data.resultado){
+
 document.getElementById("resultado").innerHTML = data.resultado
+
+}else if(data.error){
+
+if(typeof data.error === "object"){
+document.getElementById("resultado").innerHTML = JSON.stringify(data.error,null,2)
 }else{
-document.getElementById("resultado").innerHTML = "Error: " + (data.error || "No hubo respuesta")
+document.getElementById("resultado").innerHTML = data.error
+}
+
+}else{
+
+document.getElementById("resultado").innerHTML = "No hubo respuesta"
+
 }
 
 }catch(error){
