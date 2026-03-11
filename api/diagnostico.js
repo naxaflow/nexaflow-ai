@@ -1,74 +1,127 @@
+import { ejecutarMotorNexaflow } from '../NEXAFLOW_PROMPT_MAESTRO_v1.js';
+
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" })
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
-  try {
-    const { nicho, audiencia, edad_audiencia, plataforma, objetivo, friccion, tema, presencia } = req.body
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.CLAUDE_API_KEY,
-        "anthropic-version": "2023-06-01"
-      },
-      body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 1000,
-        messages: [
-          {
-            role: "user",
-            content: `Eres el motor de generación de contenido de NEXAFLOW AI. Analiza este perfil y genera el diagnóstico y las ideas.
+  const {
+    nombre,
+    email,
+    nicho,
+    audiencia,
+    edad_audiencia,
+    plataforma,
+    objetivo,
+    friccion,
+    tema,
+    presencia,
+  } = req.body;
 
-PERFIL DEL CREADOR:
-- Nicho: ${nicho}
-- Audiencia: ${audiencia}
-- Edad de la audiencia: ${edad_audiencia}
-- Plataforma principal: ${plataforma}
-- Objetivo con el contenido: ${objetivo}
-- Mayor problema al crear contenido: ${friccion}
-- Tema de esta semana: ${tema}
-- Presencia en contenido: ${presencia}
+  // Validación de campos requeridos
+  const camposFaltantes = [];
+  if (!nicho) camposFaltantes.push('nicho');
+  if (!audiencia) camposFaltantes.push('audiencia');
+  if (!plataforma) camposFaltantes.push('plataforma');
+  if (!objetivo) camposFaltantes.push('objetivo');
+  if (!tema) camposFaltantes.push('tema');
 
-INSTRUCCIONES:
-1. Si la presencia es "Sin aparecer", genera SOLO ideas de carrusel, caption, hilo o email. Nunca guión de video con cara.
-2. Cada idea debe tener un patrón viral aplicado de esta lista: curiosidad, error_comun, secreto, mito_vs_realidad, lista, historia_personal, advertencia, comparacion, hack_rapido, guia_paso_a_paso.
-3. El contenido debe sonar como el creador, no como un robot.
+  if (camposFaltantes.length > 0) {
+    return res.status(400).json({
+      error: 'CAMPOS_FALTANTES',
+      message: `Faltan los siguientes campos requeridos: ${camposFaltantes.join(', ')}`,
+    });
+  }
 
-RESPONDE EXACTAMENTE EN ESTE FORMATO:
-
-📊 TU DIAGNÓSTICO:
-[2-3 líneas sobre su situación, audiencia y oportunidad principal]
-
-💡 IDEA 1 — [Patrón viral]
-Título: [Hook exacto listo para publicar, máximo 12 palabras]
-Formato: [Formato específico]
-Estructura: [3 puntos clave del contenido]
-
-💡 IDEA 2 — [Patrón viral]
-Título: [Hook exacto listo para publicar, máximo 12 palabras]
-Formato: [Formato específico]
-Estructura: [3 puntos clave del contenido]
-
-💡 IDEA 3 — [Patrón viral]
-Título: [Hook exacto listo para publicar, máximo 12 palabras]
-Formato: [Formato específico]
-Estructura: [3 puntos clave del contenido]`
-          }
-        ]
-      })
-    })
-
-    const data = await response.json()
-    if (!response.ok) {
-      return res.status(500).json({ error: data })
-    }
-    return res.status(200).json({
-      resultado: data.content[0].text
-    })
-  } catch (error) {
+  // Validar que la API key esté configurada
+  if (!process.env.CLAUDE_API_KEY) {
     return res.status(500).json({
-      error: error.message
-    })
+      error: 'CONFIG_ERROR',
+      message: 'CLAUDE_API_KEY no está configurada en las variables de entorno.',
+    });
+  }
+
+  // Construir el objeto contexto_usuario
+  const contexto_usuario = {
+    user_id: email ? `usr_${email.replace(/[^a-z0-9]/gi, '_')}` : `usr_anon_${Date.now()}`,
+    nombre: nombre || 'Usuario',
+    email: email || null,
+
+    // Datos del nicho
+    nicho: nicho,
+    subnicho: nicho, // El usuario puede refinar esto en M2; por ahora se usa el mismo valor
+
+    // Plataforma y formato
+    plataforma_principal: plataforma,
+    presencia_en_contenido: presencia || 'Con mi rostro',
+    objetivo_principal: objetivo,
+
+    // Problema central derivado de fricción y tema
+    problema_central: friccion
+      ? `${friccion}. Tema actual que quiere comunicar: ${tema}.`
+      : `Quiere crear contenido sobre: ${tema}.`,
+
+    // Audiencia estructurada desde los campos del formulario
+    audiencia: {
+      rango_edad: edad_audiencia || '25-44',
+      genero_predominante: 'mixto',
+      nivel_consciencia: 'consciente del problema, no sabe la solución',
+      motivacion_principal: objetivo,
+      dolor_especifico: friccion || 'No especificado',
+      descripcion_libre: audiencia,
+    },
+
+    // Ángulos detectados automáticamente desde los datos disponibles
+    angulos_detectados: [
+      `El problema principal de su audiencia es: ${friccion || audiencia}`,
+      `El tema que quiere comunicar esta semana es: ${tema}`,
+      `Su audiencia tiene entre ${edad_audiencia || '25-44'} años y busca: ${objetivo}`,
+      `Su formato de presencia en cámara es: ${presencia || 'Con mi rostro'}`,
+      `La plataforma principal donde publica es: ${plataforma}`,
+    ],
+
+    // Idioma de salida (español por defecto, extensible)
+    idioma_salida: 'es',
+
+    // Sin historial en esta primera llamada
+    historial_temas: [],
+
+    // API key inyectada desde el entorno
+    api_key: process.env.CLAUDE_API_KEY,
+  };
+
+  try {
+    const resultado = await ejecutarMotorNexaflow(contexto_usuario);
+
+    if (!resultado.success) {
+      return res.status(500).json({
+        error: resultado.error,
+        message: resultado.message,
+        partial: resultado.partial || null,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      usuario: {
+        nombre: contexto_usuario.nombre,
+        email: contexto_usuario.email,
+        nicho: contexto_usuario.nicho,
+        plataforma: contexto_usuario.plataforma_principal,
+      },
+      resultado: resultado.data,
+      meta: {
+        ideas_generadas: resultado.ideas_count,
+        idea_ganadora_id: resultado.idea_ganadora_id,
+        fue_reintento: resultado.fue_reintento || false,
+        tema_para_historial: resultado.tema_para_historial || null,
+      },
+    });
+  } catch (err) {
+    console.error('[NEXAFLOW] Error en handler:', err);
+    return res.status(500).json({
+      error: 'INTERNAL_ERROR',
+      message: err.message || 'Error interno del servidor.',
+    });
   }
 }
