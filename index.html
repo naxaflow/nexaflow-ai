@@ -3,669 +3,1375 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEXAFLOW AI — Diagnóstico de Contenido</title>
+<title>NEXAFLOW AI — Sistema de Contenido con IA</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
-
+:root {
+  --bg: #080E1A;
+  --surface: #0F1829;
+  --surface2: #162035;
+  --border: #1E2D47;
+  --accent: #3B7EF6;
+  --accent2: #00E5C3;
+  --accent3: #F6923B;
+  --text: #E8EDF5;
+  --muted: #6B7E9B;
+  --danger: #F64F4F;
+}
 *{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
 body{
-  font-family:'Syne',sans-serif;
-  background:#0D1B2A;
-  color:white;
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
   min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  padding:20px;
+  overflow-x:hidden;
 }
-.container{
-  background:#1e293b;
-  padding:32px 28px;
-  border-radius:16px;
-  width:100%;
-  max-width:480px;
-  margin:20px auto;
-  box-shadow:0 10px 40px rgba(0,0,0,0.5);
-}
-.logo{text-align:center;margin-bottom:8px;}
-.logo h1{font-size:22px;font-weight:900;color:#60A5FA;letter-spacing:2px;}
-.logo p{font-size:13px;color:#94A3B8;margin-top:4px;}
-.progress{display:flex;justify-content:center;align-items:center;gap:6px;margin:20px 0;}
-.step-dot{width:10px;height:10px;border-radius:50%;background:#334155;transition:all 0.3s;}
-.step-dot.active{background:#2563EB;}
-.step-dot.done{background:#0F766E;}
-.pregunta{display:none;}
-.pregunta.activa{display:block;}
-.pregunta h2{font-size:17px;font-weight:700;color:#E2E8F0;margin-bottom:6px;line-height:1.4;}
-.pregunta p{font-size:13px;color:#94A3B8;margin-bottom:16px;}
-input,textarea{
-  width:100%;padding:14px;border-radius:10px;border:2px solid #334155;
-  background:#0f172a;color:white;font-size:15px;outline:none;
-  transition:border 0.2s;resize:none;font-family:'Syne',sans-serif;
-}
-input:focus,textarea:focus{border-color:#2563EB;}
-.opciones{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;}
-.opcion{
-  padding:10px 16px;border-radius:20px;border:2px solid #334155;
-  background:transparent;color:#CBD5E1;font-size:14px;cursor:pointer;
-  transition:all 0.2s;font-family:'Syne',sans-serif;
-}
-.opcion:hover{border-color:#2563EB;color:white;}
-.opcion.selected{border-color:#2563EB;background:#1B3A6B;color:white;font-weight:bold;}
-.btn-siguiente{
-  width:100%;margin-top:20px;padding:14px;border-radius:10px;border:none;
-  background:#2563EB;color:white;font-weight:bold;font-size:16px;cursor:pointer;
-  transition:background 0.2s;font-family:'Syne',sans-serif;
-}
-.btn-siguiente:hover{background:#1B3A6B;}
-.btn-siguiente:disabled{background:#334155;cursor:not-allowed;}
 
-/* CARGANDO */
-.cargando{text-align:center;padding:40px 0;display:none;}
-.cargando p{color:#94A3B8;font-size:14px;margin-top:16px;}
-.spinner{
-  width:40px;height:40px;border:4px solid #334155;border-top:4px solid #2563EB;
-  border-radius:50%;animation:spin 1s linear infinite;margin:0 auto;
+/* BG GRID */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(59,126,246,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,126,246,0.03) 1px, transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;
+  z-index:0;
+}
+
+.wrap{
+  position:relative;
+  z-index:1;
+  max-width:560px;
+  margin:0 auto;
+  padding:24px 20px 60px;
+}
+
+/* HEADER */
+.header{text-align:center;padding:32px 0 28px;}
+.logo-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(59,126,246,0.1);
+  border:1px solid rgba(59,126,246,0.25);
+  border-radius:100px;
+  padding:6px 14px;
+  margin-bottom:16px;
+}
+.logo-dot{
+  width:8px;height:8px;
+  border-radius:50%;
+  background:var(--accent2);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{
+  0%,100%{opacity:1;transform:scale(1);}
+  50%{opacity:0.5;transform:scale(0.8);}
+}
+.logo-badge span{
+  font-family:'Syne',sans-serif;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:2px;
+  color:var(--accent);
+}
+.header h1{
+  font-family:'Syne',sans-serif;
+  font-size:28px;
+  font-weight:800;
+  line-height:1.2;
+  margin-bottom:10px;
+}
+.header h1 em{
+  font-style:normal;
+  background:linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.header p{
+  font-size:14px;
+  color:var(--muted);
+  line-height:1.6;
+}
+
+/* PROGRESS */
+.progress-bar{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  margin:0 0 28px;
+  justify-content:center;
+}
+.pb-seg{
+  height:3px;
+  border-radius:2px;
+  background:var(--border);
+  flex:1;
+  transition:background 0.4s;
+  max-width:44px;
+}
+.pb-seg.done{background:var(--accent2);}
+.pb-seg.active{background:var(--accent);}
+
+/* CARD */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:24px;
+  margin-bottom:16px;
+}
+.step-label{
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:1.5px;
+  color:var(--accent);
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+.card h2{
+  font-family:'Syne',sans-serif;
+  font-size:19px;
+  font-weight:700;
+  line-height:1.35;
+  margin-bottom:6px;
+}
+.card .hint{
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:18px;
+  line-height:1.5;
+}
+
+/* INPUTS */
+input[type=text],input[type=email],textarea,select{
+  width:100%;
+  padding:13px 16px;
+  background:var(--surface2);
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:15px;
+  outline:none;
+  transition:border 0.2s,box-shadow 0.2s;
+  -webkit-appearance:none;
+}
+input:focus,textarea:focus,select:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(59,126,246,0.12);
+}
+textarea{resize:none;}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7E9B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 14px center;
+  cursor:pointer;
+}
+select option{background:var(--surface2);}
+
+.input-row{display:flex;gap:12px;}
+.input-row>*{flex:1;}
+
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+.chip{
+  padding:9px 16px;
+  border-radius:100px;
+  border:1.5px solid var(--border);
+  background:transparent;
+  color:var(--muted);
+  font-family:'DM Sans',sans-serif;
+  font-size:13px;
+  cursor:pointer;
+  transition:all 0.2s;
+  white-space:nowrap;
+}
+.chip:hover{border-color:var(--accent);color:var(--text);}
+.chip.on{
+  border-color:var(--accent);
+  background:rgba(59,126,246,0.12);
+  color:var(--text);
+  font-weight:500;
+}
+.chip.on-teal{
+  border-color:var(--accent2);
+  background:rgba(0,229,195,0.1);
+  color:var(--accent2);
+  font-weight:500;
+}
+
+/* SUBNICHO */
+.subnicho-wrap{margin-top:14px;display:none;}
+.subnicho-wrap.visible{display:block;}
+
+/* STEP VISIBILITY */
+.step{display:none;}
+.step.active{display:block;animation:fadeUp 0.3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* BTN */
+.btn{
+  width:100%;
+  padding:15px;
+  border-radius:12px;
+  border:none;
+  font-family:'Syne',sans-serif;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all 0.2s;
+  margin-top:16px;
+}
+.btn-primary{
+  background:linear-gradient(135deg, var(--accent), #2563d4);
+  color:white;
+  box-shadow:0 4px 20px rgba(59,126,246,0.3);
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(59,126,246,0.4);}
+.btn-primary:disabled{background:var(--border);box-shadow:none;cursor:not-allowed;transform:none;color:var(--muted);}
+.btn-outline{
+  background:transparent;
+  border:1.5px solid var(--border);
+  color:var(--muted);
+  font-size:14px;
+  margin-top:8px;
+}
+.btn-outline:hover{border-color:var(--muted);color:var(--text);}
+.btn-teal{
+  background:linear-gradient(135deg,#00b89c,#007a67);
+  color:white;
+  box-shadow:0 4px 20px rgba(0,229,195,0.25);
+}
+.btn-orange{
+  background:linear-gradient(135deg,var(--accent3),#c4671a);
+  color:white;
+  box-shadow:0 4px 20px rgba(246,146,59,0.25);
+}
+
+/* LOADING */
+.loading{display:none;text-align:center;padding:48px 24px;}
+.loading.active{display:block;}
+.spinner-ring{
+  width:56px;height:56px;
+  border:3px solid var(--border);
+  border-top:3px solid var(--accent);
+  border-right:3px solid var(--accent2);
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+  margin:0 auto 20px;
 }
 @keyframes spin{to{transform:rotate(360deg);}}
-
-/* RESULTADO */
-.resultado{display:none;margin-top:8px;}
-
-/* Diagnóstico (Capa 1) */
-.bloque{background:#0f172a;border-radius:12px;padding:18px;margin-bottom:14px;border:1px solid #1e3a5f;}
-.bloque-titulo{
-  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
-  color:#60A5FA;margin-bottom:12px;display:flex;align-items:center;gap:8px;
-}
-.bloque-titulo span{background:#1B3A6B;padding:3px 8px;border-radius:6px;}
-
-/* Ideas */
-.idea-card{
-  background:#0f172a;border:1px solid #1e3a5f;border-radius:10px;
-  padding:14px;margin-bottom:10px;cursor:pointer;transition:all 0.2s;
-}
-.idea-card:hover{border-color:#2563EB;}
-.idea-card.ganadora{border-color:#0F766E;background:#0d2420;}
-.idea-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
-.idea-tipo{
-  font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
-  color:#94A3B8;margin-bottom:4px;
-}
-.idea-titulo{font-size:14px;font-weight:700;color:#E2E8F0;line-height:1.4;}
-.idea-score{
-  font-family:'Space Mono',monospace;font-size:13px;font-weight:700;
-  color:#60A5FA;white-space:nowrap;background:#1B3A6B;
-  padding:4px 8px;border-radius:6px;flex-shrink:0;
-}
-.idea-score.alto{color:#34D399;background:#0d2420;}
-.idea-hook{
-  font-size:12px;color:#94A3B8;margin-top:8px;font-style:italic;
-  border-left:2px solid #334155;padding-left:8px;line-height:1.5;
-}
-.idea-emocion{
-  display:inline-block;margin-top:8px;font-size:11px;font-weight:600;
-  padding:3px 10px;border-radius:20px;background:#1B3A6B;color:#93C5FD;
-}
-.badge-ganadora{
-  display:inline-block;font-size:10px;font-weight:700;letter-spacing:1px;
-  text-transform:uppercase;background:#0F766E;color:white;
-  padding:3px 8px;border-radius:6px;margin-bottom:6px;
+.loading p{color:var(--muted);font-size:14px;line-height:1.7;}
+.loading .loading-step{
+  font-family:'Syne',sans-serif;
+  font-size:16px;
+  color:var(--text);
+  margin-bottom:8px;
 }
 
-/* Guión */
-.guion-gancho{
-  background:#1B3A6B;border-radius:8px;padding:12px 14px;margin-bottom:8px;
-  font-size:14px;font-weight:700;color:#E2E8F0;line-height:1.5;
-  border-left:3px solid #2563EB;
+/* RESULT */
+.result{display:none;}
+.result.active{display:block;}
+
+.result-header{
+  text-align:center;
+  padding:20px 0 24px;
 }
-.guion-gancho.recomendado{border-left-color:#34D399;background:#0d2420;}
-.guion-label{
-  font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
-  color:#60A5FA;margin-bottom:6px;display:block;
+.result-header .badge-success{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:rgba(0,229,195,0.1);
+  border:1px solid rgba(0,229,195,0.3);
+  border-radius:100px;
+  padding:6px 14px;
+  margin-bottom:14px;
+  font-size:12px;
+  font-weight:600;
+  color:var(--accent2);
+  letter-spacing:1px;
 }
-.guion-cuerpo{
-  font-size:14px;color:#CBD5E1;line-height:1.8;
-  background:#0f172a;border-radius:8px;padding:14px;margin-bottom:10px;
+.result-header h2{
+  font-family:'Syne',sans-serif;
+  font-size:22px;
+  font-weight:800;
+  margin-bottom:6px;
 }
-.guion-cta{
-  font-size:14px;font-weight:700;color:#34D399;
-  background:#0d2420;border-radius:8px;padding:12px 14px;
-  border-left:3px solid #0F766E;
+.result-header p{font-size:13px;color:var(--muted);}
+
+/* CAPA CARDS */
+.capa{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  margin-bottom:14px;
+  overflow:hidden;
 }
-.guion-meta{
-  display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;
+.capa-header{
+  padding:16px 20px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  cursor:pointer;
+  user-select:none;
+  transition:background 0.2s;
 }
-.meta-tag{
-  font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;
-  background:#334155;color:#94A3B8;
+.capa-header:hover{background:var(--surface2);}
+.capa-icon{
+  width:36px;height:36px;
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+  flex-shrink:0;
+}
+.capa-title{
+  flex:1;
+  font-family:'Syne',sans-serif;
+  font-size:14px;
+  font-weight:700;
+}
+.capa-arrow{
+  font-size:12px;
+  color:var(--muted);
+  transition:transform 0.3s;
+}
+.capa.open .capa-arrow{transform:rotate(180deg);}
+.capa-body{
+  display:none;
+  padding:0 20px 20px;
+  border-top:1px solid var(--border);
+}
+.capa.open .capa-body{display:block;}
+
+/* DIAGNOSTICO */
+.diag-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.diag-item{
+  background:var(--surface2);
+  border-radius:10px;
+  padding:12px;
+}
+.diag-item .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.diag-item .val{font-size:13px;color:var(--text);line-height:1.4;}
+.diag-full{
+  background:var(--surface2);
+  border-radius:10px;
+  padding:14px;
+  margin-top:10px;
+  font-size:13px;
+  line-height:1.6;
+  color:var(--text);
+}
+.diag-full .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.risk-item{
+  display:flex;
+  gap:8px;
+  align-items:flex-start;
+  margin-top:6px;
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.4;
+}
+.risk-dot{width:6px;height:6px;border-radius:50%;background:var(--danger);margin-top:5px;flex-shrink:0;}
+
+/* IDEAS */
+.idea-winner{
+  background:linear-gradient(135deg,rgba(59,126,246,0.12),rgba(0,229,195,0.08));
+  border:1px solid rgba(59,126,246,0.3);
+  border-radius:12px;
+  padding:16px;
+  margin-top:14px;
+}
+.idea-winner .winner-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  background:rgba(0,229,195,0.15);
+  border-radius:100px;
+  padding:3px 10px;
+  font-size:11px;
+  font-weight:700;
+  color:var(--accent2);
+  letter-spacing:1px;
+  margin-bottom:10px;
+}
+.idea-title{
+  font-family:'Syne',sans-serif;
+  font-size:16px;
+  font-weight:700;
+  margin-bottom:8px;
+  line-height:1.35;
+}
+.idea-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.tag{
+  padding:3px 10px;
+  border-radius:100px;
+  font-size:11px;
+  font-weight:600;
+  background:var(--surface2);
+  color:var(--muted);
+  border:1px solid var(--border);
+}
+.tag.blue{background:rgba(59,126,246,0.12);color:var(--accent);border-color:rgba(59,126,246,0.2);}
+.tag.teal{background:rgba(0,229,195,0.1);color:var(--accent2);border-color:rgba(0,229,195,0.2);}
+.tag.orange{background:rgba(246,146,59,0.1);color:var(--accent3);border-color:rgba(246,146,59,0.2);}
+.score-bar{
+  height:4px;
+  background:var(--border);
+  border-radius:2px;
+  overflow:hidden;
+  margin-top:8px;
+}
+.score-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border-radius:2px;
+  transition:width 1s ease;
 }
 
-/* Prompts Video */
-.clip-card{
-  background:#0f172a;border:1px solid #1e3a5f;border-radius:10px;
-  padding:14px;margin-bottom:10px;
+.ideas-list{margin-top:14px;}
+.idea-row{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:12px 14px;
+  margin-bottom:8px;
+  cursor:pointer;
+  transition:border-color 0.2s;
 }
-.clip-segundos{
-  font-family:'Space Mono',monospace;font-size:11px;color:#60A5FA;
-  font-weight:700;margin-bottom:6px;
+.idea-row:hover{border-color:var(--accent);}
+.idea-row .ir-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.idea-row .ir-title{font-size:13px;font-weight:500;line-height:1.4;flex:1;}
+.idea-row .ir-score{
+  font-family:'Syne',sans-serif;
+  font-size:13px;
+  font-weight:700;
+  color:var(--accent2);
+  flex-shrink:0;
 }
-.clip-frase{
-  font-size:13px;font-style:italic;color:#94A3B8;
-  margin-bottom:10px;border-left:2px solid #334155;padding-left:8px;
+.idea-row .ir-meta{font-size:11px;color:var(--muted);margin-top:4px;}
+
+/* GUION */
+.gancho-opts{margin-top:14px;}
+.gancho-opt{
+  background:var(--surface2);
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  padding:13px 16px;
+  margin-bottom:8px;
+  cursor:pointer;
+  transition:all 0.2s;
+  position:relative;
 }
-.clip-prompt{
-  font-size:12px;color:#CBD5E1;line-height:1.6;
-  background:#1B3A6B20;border-radius:6px;padding:10px;margin-bottom:6px;
+.gancho-opt:hover{border-color:var(--accent);}
+.gancho-opt.recommended{
+  border-color:var(--accent2);
+  background:rgba(0,229,195,0.06);
 }
-.clip-prompt-label{
-  font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
-  color:#60A5FA;margin-bottom:4px;display:block;
+.gancho-opt .rec-badge{
+  position:absolute;
+  top:-8px;right:12px;
+  background:var(--accent2);
+  color:#000;
+  font-size:10px;
+  font-weight:700;
+  padding:2px 8px;
+  border-radius:100px;
+  letter-spacing:0.5px;
+}
+.gancho-text{font-size:14px;line-height:1.5;}
+.cuerpo-box{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:16px;
+  margin-top:14px;
+  font-size:13px;
+  line-height:1.8;
+  color:var(--text);
+  white-space:pre-line;
+}
+.cta-box{
+  background:rgba(246,146,59,0.08);
+  border:1px solid rgba(246,146,59,0.25);
+  border-radius:10px;
+  padding:14px 16px;
+  margin-top:10px;
+  font-size:13px;
+  line-height:1.6;
+}
+.cta-box .label{font-size:10px;color:var(--accent3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:700;}
+.duracion-info{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+.dur-chip{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:8px 12px;
+  font-size:12px;
+  color:var(--muted);
+  flex:1;
+  text-align:center;
+}
+.dur-chip strong{display:block;font-family:'Syne',sans-serif;font-size:15px;color:var(--text);}
+
+/* VIDEO CLIPS */
+.clip-item{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:14px;
+  margin-bottom:8px;
+}
+.clip-header{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+}
+.clip-num{
+  width:28px;height:28px;
+  border-radius:8px;
+  background:rgba(59,126,246,0.15);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;
+  font-size:12px;
+  font-weight:700;
+  color:var(--accent);
+  flex-shrink:0;
+}
+.clip-time{font-size:12px;color:var(--muted);}
+.clip-frase{font-size:13px;line-height:1.5;margin-bottom:10px;color:var(--text);}
+.clip-prompts{display:flex;flex-direction:column;gap:6px;}
+.prompt-block{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:10px 12px;
+}
+.prompt-block .pl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.prompt-block p{font-size:12px;line-height:1.5;color:var(--muted);}
+.btn-copy-prompt{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  margin-top:6px;
+  padding:4px 10px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--muted);
+  font-size:11px;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.btn-copy-prompt:hover{border-color:var(--accent);color:var(--accent);}
+
+/* PUBLICACION */
+.pub-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.pub-item{
+  background:var(--surface2);
+  border-radius:10px;
+  padding:12px;
+}
+.pub-item .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.pub-item .val{font-size:14px;color:var(--text);font-weight:500;}
+.hashtags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+.ht{
+  padding:5px 12px;
+  border-radius:100px;
+  background:rgba(59,126,246,0.08);
+  border:1px solid rgba(59,126,246,0.18);
+  font-size:12px;
+  color:var(--accent);
+}
+.acciones-box{
+  background:var(--surface2);
+  border-radius:10px;
+  padding:14px;
+  margin-top:10px;
+  font-size:13px;
+  line-height:1.6;
+}
+.acciones-box .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.accion-row{display:flex;gap:8px;margin-bottom:6px;align-items:flex-start;}
+.accion-dot{width:6px;height:6px;border-radius:50%;margin-top:6px;flex-shrink:0;}
+
+/* RESULT ACTIONS */
+.result-actions{margin-top:20px;display:flex;flex-direction:column;gap:10px;}
+
+/* TOAST */
+.toast{
+  position:fixed;
+  bottom:24px;left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:12px 20px;
+  font-size:13px;
+  color:var(--text);
+  transition:transform 0.3s;
+  z-index:100;
+  white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* UTIL */
+.mt8{margin-top:8px;}
+.mt12{margin-top:12px;}
+.mt16{margin-top:16px;}
+.section-title{
+  font-family:'Syne',sans-serif;
+  font-size:12px;
+  font-weight:700;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  margin:16px 0 10px;
 }
 
-/* Publicación */
-.pub-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
-.pub-item{background:#1B3A6B20;border-radius:8px;padding:12px;}
-.pub-item-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#60A5FA;margin-bottom:4px;}
-.pub-item-valor{font-size:14px;font-weight:700;color:#E2E8F0;}
-.hashtags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
-.hashtag{font-size:12px;background:#1B3A6B;color:#93C5FD;padding:4px 10px;border-radius:20px;}
-.seccion-titulo{
-  font-size:13px;font-weight:700;color:#60A5FA;margin:18px 0 10px;
-  text-transform:uppercase;letter-spacing:1.5px;display:flex;align-items:center;gap:8px;
+@media(max-width:480px){
+  .diag-grid{grid-template-columns:1fr;}
+  .pub-grid{grid-template-columns:1fr;}
+  .input-row{flex-direction:column;}
+  .duracion-info{flex-direction:column;}
 }
-.seccion-titulo::after{content:'';flex:1;height:1px;background:#1e3a5f;}
-
-/* Botones resultado */
-.btn-copiar{
-  width:100%;margin-top:12px;padding:14px;border-radius:10px;border:2px solid #0F766E;
-  background:transparent;color:#0F766E;font-weight:bold;font-size:15px;
-  cursor:pointer;transition:all 0.2s;font-family:'Syne',sans-serif;
-}
-.btn-copiar:hover{background:#0F766E;color:white;}
-.btn-lista{
-  width:100%;margin-top:10px;padding:14px;border-radius:10px;border:none;
-  background:#B45309;color:white;font-weight:bold;font-size:15px;
-  cursor:pointer;transition:background 0.2s;font-family:'Syne',sans-serif;
-}
-.btn-lista:hover{background:#92400E;}
-.btn-nueva{
-  width:100%;margin-top:10px;padding:12px;border-radius:10px;border:2px solid #334155;
-  background:transparent;color:#94A3B8;font-size:14px;cursor:pointer;
-  transition:all 0.2s;font-family:'Syne',sans-serif;
-}
-.btn-nueva:hover{border-color:#94A3B8;color:white;}
-
-.error-box{
-  background:#2d1515;border:1px solid #7f1d1d;border-radius:10px;
-  padding:16px;color:#FCA5A5;font-size:14px;line-height:1.6;
-}
-
-/* Tabs para ideas */
-.tab-container{margin-bottom:4px;}
-.tab-hint{font-size:11px;color:#64748B;margin-bottom:8px;text-align:center;}
 </style>
 </head>
 <body>
-<div class="container">
 
-  <div class="logo">
-    <h1>NEXAFLOW AI</h1>
-    <p>Tu sistema de contenido con IA</p>
-  </div>
+<div class="wrap">
 
-  <div class="progress" id="progress"></div>
-
-  <!-- P1 -->
-  <div class="pregunta activa" id="p1">
-    <h2>¿En qué tema o industria creas contenido?</h2>
-    <p>Sé específico. Ej: marketing digital, fitness, finanzas personales, cocina vegana...</p>
-    <input type="text" id="nicho" placeholder="Escribe tu nicho aquí" oninput="verificarInput('nicho','btn1')">
-    <button class="btn-siguiente" id="btn1" onclick="siguiente(2)" disabled>Continuar →</button>
-  </div>
-
-  <!-- P2 -->
-  <div class="pregunta" id="p2">
-    <h2>¿A quién le hablas con ese contenido?</h2>
-    <p>Descríbeme a tu seguidor ideal — quién es, qué le preocupa, qué quiere lograr.</p>
-    <textarea id="audiencia" rows="3" placeholder="Ej: Mujeres de 30 años que quieren bajar de peso pero no tienen tiempo..." oninput="verificarInput('audiencia','btn2')"></textarea>
-    <button class="btn-siguiente" id="btn2" onclick="siguiente(3)" disabled>Continuar →</button>
-  </div>
-
-  <!-- P3 -->
-  <div class="pregunta" id="p3">
-    <h2>¿Qué edad tiene aproximadamente esa audiencia?</h2>
-    <p>Selecciona el rango que mejor describe a tu público objetivo.</p>
-    <div class="opciones" id="ops3">
-      <button class="opcion" onclick="seleccionar('edad_audiencia',this,'18-24','btn3')">18-24</button>
-      <button class="opcion" onclick="seleccionar('edad_audiencia',this,'25-34','btn3')">25-34</button>
-      <button class="opcion" onclick="seleccionar('edad_audiencia',this,'35-44','btn3')">35-44</button>
-      <button class="opcion" onclick="seleccionar('edad_audiencia',this,'45-54','btn3')">45-54</button>
-      <button class="opcion" onclick="seleccionar('edad_audiencia',this,'55+','btn3')">55+</button>
-      <button class="opcion" onclick="seleccionar('edad_audiencia',this,'Varias edades','btn3')">Varias edades</button>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo-badge">
+      <div class="logo-dot"></div>
+      <span>NEXAFLOW AI</span>
     </div>
-    <button class="btn-siguiente" id="btn3" onclick="siguiente(4)" disabled>Continuar →</button>
+    <h1>Tu <em>sistema de contenido</em><br>con inteligencia artificial</h1>
+    <p>Diagnóstico + ideas + guión + prompts de video.<br>Todo en 60 segundos. Completamente gratis.</p>
   </div>
 
-  <!-- P4 -->
-  <div class="pregunta" id="p4">
-    <h2>¿En qué plataforma publicas principalmente?</h2>
-    <p>Donde está tu audiencia ahora mismo.</p>
-    <div class="opciones" id="ops4">
-      <button class="opcion" onclick="seleccionar('plataforma',this,'Instagram','btn4')">📱 Instagram</button>
-      <button class="opcion" onclick="seleccionar('plataforma',this,'TikTok','btn4')">🎵 TikTok</button>
-      <button class="opcion" onclick="seleccionar('plataforma',this,'YouTube','btn4')">▶️ YouTube</button>
-      <button class="opcion" onclick="seleccionar('plataforma',this,'LinkedIn','btn4')">💼 LinkedIn</button>
-      <button class="opcion" onclick="seleccionar('plataforma',this,'Facebook','btn4')">📘 Facebook</button>
-      <button class="opcion" onclick="seleccionar('plataforma',this,'Otra','btn4')">✍️ Otra</button>
+  <!-- PROGRESS -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- ═══════════════ PASO 0: BIENVENIDA ═══════════════ -->
+  <div class="step active" id="s0">
+    <div class="card">
+      <div class="step-label">Empecemos</div>
+      <h2>¿Cómo te llamas y dónde te enviamos los resultados?</h2>
+      <p class="hint">Es gratis. Sin spam. Te enviamos tu análisis completo.</p>
+      <input type="text" id="nombre" placeholder="Tu nombre" oninput="check0()">
+      <div style="height:10px"></div>
+      <input type="email" id="email" placeholder="Tu correo electrónico" oninput="check0()">
     </div>
-    <button class="btn-siguiente" id="btn4" onclick="siguiente(5)" disabled>Continuar →</button>
+    <button class="btn btn-primary" id="btn0" onclick="goTo(1)" disabled>Comenzar análisis →</button>
   </div>
 
-  <!-- P5 -->
-  <div class="pregunta" id="p5">
-    <h2>¿Qué quieres lograr con tu contenido?</h2>
-    <p>Tu objetivo principal define el tipo de contenido que genera más resultados.</p>
-    <div class="opciones" id="ops5">
-      <button class="opcion" onclick="seleccionar('objetivo',this,'Atraer clientes','btn5')">🎯 Atraer clientes</button>
-      <button class="opcion" onclick="seleccionar('objetivo',this,'Posicionarme como referente','btn5')">🏆 Posicionarme</button>
-      <button class="opcion" onclick="seleccionar('objetivo',this,'Vender algo específico','btn5')">💰 Vender</button>
-      <button class="opcion" onclick="seleccionar('objetivo',this,'Construir comunidad','btn5')">👥 Comunidad</button>
-      <button class="opcion" onclick="seleccionar('objetivo',this,'Todo lo anterior','btn5')">🔄 Todo</button>
+  <!-- ═══════════════ PASO 1: NICHO ═══════════════ -->
+  <div class="step" id="s1">
+    <div class="card">
+      <div class="step-label">Paso 1 de 8 — Tu nicho</div>
+      <h2>¿En qué categoría creas contenido?</h2>
+      <p class="hint">Selecciona la que mejor te describe.</p>
+      <select id="nicho" onchange="onNicho()">
+        <option value="">— Selecciona una categoría —</option>
+        <option value="Crecimiento personal">🧠 Crecimiento personal</option>
+        <option value="Marca personal">⭐ Marca personal</option>
+        <option value="Emprendimiento">🚀 Emprendimiento</option>
+        <option value="Marketing digital">📣 Marketing digital</option>
+        <option value="Finanzas">💰 Finanzas</option>
+        <option value="Salud y bienestar">💪 Salud y bienestar</option>
+        <option value="Educación y aprendizaje">📚 Educación y aprendizaje</option>
+        <option value="Tecnología e IA">🤖 Tecnología e IA</option>
+        <option value="Estilo de vida">✨ Estilo de vida</option>
+        <option value="Espiritualidad">🌿 Espiritualidad</option>
+        <option value="Entretenimiento y cultura">🎭 Entretenimiento y cultura</option>
+        <option value="Relaciones">❤️ Relaciones</option>
+      </select>
+
+      <div class="subnicho-wrap" id="subnichoWrap">
+        <div style="height:12px"></div>
+        <p class="hint" style="margin-bottom:8px">¿Cuál es tu subnicho específico?</p>
+        <select id="subnicho" onchange="check1()">
+          <option value="">— Selecciona tu subnicho —</option>
+        </select>
+      </div>
     </div>
-    <button class="btn-siguiente" id="btn5" onclick="siguiente(6)" disabled>Continuar →</button>
+    <button class="btn btn-primary" id="btn1" onclick="goTo(2)" disabled>Continuar →</button>
   </div>
 
-  <!-- P6 -->
-  <div class="pregunta" id="p6">
-    <h2>¿Cuál es tu mayor problema al crear contenido hoy?</h2>
-    <p>Sin filtro. Esta es la pregunta más importante.</p>
-    <textarea id="friccion" rows="3" placeholder="Ej: No sé qué decir, me bloqueo, no tengo tiempo, no sé qué funciona..." oninput="verificarInput('friccion','btn6')"></textarea>
-    <button class="btn-siguiente" id="btn6" onclick="siguiente(7)" disabled>Continuar →</button>
-  </div>
-
-  <!-- P7 -->
-  <div class="pregunta" id="p7">
-    <h2>¿Hay un tema específico para esta semana?</h2>
-    <p>Si no tienes uno, dime el tema del que más te gusta hablar.</p>
-    <textarea id="tema" rows="3" placeholder="Ej: Cómo empezar a invertir con poco dinero / El tema que más domino es..." oninput="verificarInput('tema','btn7')"></textarea>
-    <button class="btn-siguiente" id="btn7" onclick="siguiente(8)" disabled>Continuar →</button>
-  </div>
-
-  <!-- P8 -->
-  <div class="pregunta" id="p8">
-    <h2>¿Cómo prefieres aparecer en tu contenido?</h2>
-    <p>Esto define qué formatos te recomienda el sistema.</p>
-    <div class="opciones" id="ops8">
-      <button class="opcion" onclick="seleccionar('presencia',this,'Con mi rostro y voz','btn8')">🎥 Con mi rostro</button>
-      <button class="opcion" onclick="seleccionar('presencia',this,'Solo mi voz sin cámara','btn8')">🎙️ Solo mi voz</button>
-      <button class="opcion" onclick="seleccionar('presencia',this,'Sin aparecer — solo texto y diseño','btn8')">✍️ Sin aparecer</button>
-      <button class="opcion" onclick="seleccionar('presencia',this,'Con avatar o personaje digital','btn8')">🤖 Con avatar</button>
-      <button class="opcion" onclick="seleccionar('presencia',this,'Depende del contenido','btn8')">🔄 Depende</button>
+  <!-- ═══════════════ PASO 2: AUDIENCIA ═══════════════ -->
+  <div class="step" id="s2">
+    <div class="card">
+      <div class="step-label">Paso 2 de 8 — Tu audiencia</div>
+      <h2>¿A quién le hablas?</h2>
+      <p class="hint">Selecciona el perfil que mejor describe a tu seguidor ideal.</p>
+      <div class="chips" id="audienciaChips"></div>
+      <div class="subnicho-wrap" id="audienciaCustomWrap" style="margin-top:12px;">
+        <textarea id="audienciaCustom" rows="2" placeholder="O descríbela tú mismo..." oninput="checkAudiencia()"></textarea>
+      </div>
     </div>
-    <button class="btn-siguiente" id="btn8" onclick="generar()" disabled>✨ Generar mis ideas</button>
+    <button class="btn btn-primary" id="btn2" onclick="goTo(3)" disabled>Continuar →</button>
   </div>
 
-  <!-- CARGANDO -->
-  <div class="cargando" id="cargando">
-    <div class="spinner"></div>
-    <p id="msg-carga">Analizando tu perfil...</p>
+  <!-- ═══════════════ PASO 3: EDAD ═══════════════ -->
+  <div class="step" id="s3">
+    <div class="card">
+      <div class="step-label">Paso 3 de 8 — Edad de tu audiencia</div>
+      <h2>¿Qué edad tiene tu audiencia?</h2>
+      <p class="hint">La edad del mercado al que le hablas, no la tuya.</p>
+      <div class="chips">
+        <button class="chip" onclick="selectChip(this,'edad','18-24')">18-24</button>
+        <button class="chip" onclick="selectChip(this,'edad','25-34')">25-34</button>
+        <button class="chip" onclick="selectChip(this,'edad','35-44')">35-44</button>
+        <button class="chip" onclick="selectChip(this,'edad','45-54')">45-54</button>
+        <button class="chip" onclick="selectChip(this,'edad','55+')">55+</button>
+        <button class="chip" onclick="selectChip(this,'edad','Varias edades')">Varias edades</button>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="btn3" onclick="goTo(4)" disabled>Continuar →</button>
   </div>
 
-  <!-- RESULTADO -->
-  <div class="resultado" id="resultado"></div>
+  <!-- ═══════════════ PASO 4: PLATAFORMA ═══════════════ -->
+  <div class="step" id="s4">
+    <div class="card">
+      <div class="step-label">Paso 4 de 8 — Plataformas</div>
+      <h2>¿Dónde publicas tu contenido?</h2>
+      <p class="hint">Puedes seleccionar varias. Cada plataforma tiene una audiencia diferente.</p>
+      <div class="chips">
+        <button class="chip" onclick="togglePlataforma(this,'Instagram')">📱 Instagram</button>
+        <button class="chip" onclick="togglePlataforma(this,'TikTok')">🎵 TikTok</button>
+        <button class="chip" onclick="togglePlataforma(this,'YouTube')">▶️ YouTube</button>
+        <button class="chip" onclick="togglePlataforma(this,'LinkedIn')">💼 LinkedIn</button>
+        <button class="chip" onclick="togglePlataforma(this,'Facebook')">📘 Facebook</button>
+        <button class="chip" onclick="togglePlataforma(this,'Twitter/X')">🐦 Twitter/X</button>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="btn4" onclick="goTo(5)" disabled>Continuar →</button>
+  </div>
 
-</div>
+  <!-- ═══════════════ PASO 5: OBJETIVO ═══════════════ -->
+  <div class="step" id="s5">
+    <div class="card">
+      <div class="step-label">Paso 5 de 8 — Tu objetivo</div>
+      <h2>¿Qué quieres lograr con tu contenido?</h2>
+      <p class="hint">Tu objetivo define qué tipo de contenido genera más resultados.</p>
+      <div class="chips">
+        <button class="chip" onclick="selectChip(this,'objetivo','Atraer clientes')">🎯 Atraer clientes</button>
+        <button class="chip" onclick="selectChip(this,'objetivo','Posicionarme como referente')">🏆 Posicionarme</button>
+        <button class="chip" onclick="selectChip(this,'objetivo','Vender algo específico')">💰 Vender</button>
+        <button class="chip" onclick="selectChip(this,'objetivo','Construir comunidad')">👥 Comunidad</button>
+        <button class="chip" onclick="selectChip(this,'objetivo','Todo lo anterior')">🔄 Todo</button>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="btn5" onclick="goTo(6)" disabled>Continuar →</button>
+  </div>
+
+  <!-- ═══════════════ PASO 6: FRICCION ═══════════════ -->
+  <div class="step" id="s6">
+    <div class="card">
+      <div class="step-label">Paso 6 de 8 — Tu mayor problema</div>
+      <h2>¿Cuál es tu mayor obstáculo al crear contenido hoy?</h2>
+      <p class="hint">Sin filtro. Esta respuesta es la más importante de todo el análisis.</p>
+      <div class="chips" style="margin-bottom:12px;">
+        <button class="chip" onclick="setFriccion(this,'No sé qué decir o de qué hablar')">Sin ideas</button>
+        <button class="chip" onclick="setFriccion(this,'Me bloqueo y no publico')">Me bloqueo</button>
+        <button class="chip" onclick="setFriccion(this,'No tengo tiempo suficiente')">Sin tiempo</button>
+        <button class="chip" onclick="setFriccion(this,'No sé qué formato o plataforma usar')">Sin estrategia</button>
+        <button class="chip" onclick="setFriccion(this,'Publico pero no tengo resultados')">Sin resultados</button>
+        <button class="chip" onclick="setFriccion(this,'Me da vergüenza aparecer en cámara')">Vergüenza cámara</button>
+      </div>
+      <textarea id="friccion" rows="2" placeholder="O descríbelo con tus palabras..." oninput="check6()"></textarea>
+    </div>
+    <button class="btn btn-primary" id="btn6" onclick="goTo(7)" disabled>Continuar →</button>
+  </div>
+
+  <!-- ═══════════════ PASO 7: TEMA ═══════════════ -->
+  <div class="step" id="s7">
+    <div class="card">
+      <div class="step-label">Paso 7 de 8 — Tema de esta semana</div>
+      <h2>¿Hay un tema que quieras comunicar esta semana?</h2>
+      <p class="hint">Si no tienes uno, cuéntame el tema del que más disfrutas hablar.</p>
+      <textarea id="tema" rows="3" placeholder="Ej: Cómo empezar a invertir con poco dinero / El tema que más domino es..." oninput="check7()"></textarea>
+    </div>
+    <button class="btn btn-primary" id="btn7" onclick="goTo(8)" disabled>Continuar →</button>
+  </div>
+
+  <!-- ═══════════════ PASO 8: PRESENCIA ═══════════════ -->
+  <div class="step" id="s8">
+    <div class="card">
+      <div class="step-label">Paso 8 de 8 — Tu presencia</div>
+      <h2>¿Cómo prefieres aparecer en tu contenido?</h2>
+      <p class="hint">Esto define qué formatos el sistema te recomienda.</p>
+      <div class="chips">
+        <button class="chip" onclick="selectChip(this,'presencia','Con mi rostro y voz')">🎥 Con mi rostro</button>
+        <button class="chip" onclick="selectChip(this,'presencia','Solo mi voz sin cámara')">🎙️ Solo voz</button>
+        <button class="chip" onclick="selectChip(this,'presencia','Sin aparecer — solo texto y diseño')">✍️ Sin aparecer</button>
+        <button class="chip" onclick="selectChip(this,'presencia','Con avatar o personaje digital')">🤖 Con avatar</button>
+        <button class="chip" onclick="selectChip(this,'presencia','Depende del contenido')">🔄 Depende</button>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="btn8" onclick="generarAnalisis()" disabled>✨ Generar mi análisis completo</button>
+  </div>
+
+  <!-- ═══════════════ LOADING ═══════════════ -->
+  <div class="loading" id="loading">
+    <div class="spinner-ring"></div>
+    <div class="loading-step" id="loadingStep">Analizando tu perfil...</div>
+    <p id="loadingMsg">El motor de NEXAFLOW está procesando<br>tu contexto completo.</p>
+  </div>
+
+  <!-- ═══════════════ RESULTADO ═══════════════ -->
+  <div class="result" id="result">
+
+    <div class="result-header">
+      <div class="badge-success">✦ ANÁLISIS COMPLETO</div>
+      <h2 id="resultTitle">Tu sistema de contenido está listo</h2>
+      <p id="resultSub">6 capas de producción generadas para tu perfil</p>
+    </div>
+
+    <!-- CAPA 1: DIAGNÓSTICO -->
+    <div class="capa open" id="capa1">
+      <div class="capa-header" onclick="toggleCapa('capa1')">
+        <div class="capa-icon" style="background:rgba(59,126,246,0.15);">📊</div>
+        <div class="capa-title">Diagnóstico de tu perfil</div>
+        <div class="capa-arrow">▾</div>
+      </div>
+      <div class="capa-body" id="capa1Body"></div>
+    </div>
+
+    <!-- CAPA 2+3: IDEAS -->
+    <div class="capa open" id="capa2">
+      <div class="capa-header" onclick="toggleCapa('capa2')">
+        <div class="capa-icon" style="background:rgba(0,229,195,0.15);">💡</div>
+        <div class="capa-title">Ideas de contenido + idea ganadora</div>
+        <div class="capa-arrow">▾</div>
+      </div>
+      <div class="capa-body" id="capa2Body"></div>
+    </div>
+
+    <!-- CAPA 4: GUIÓN -->
+    <div class="capa" id="capa4">
+      <div class="capa-header" onclick="toggleCapa('capa4')">
+        <div class="capa-icon" style="background:rgba(246,146,59,0.15);">✍️</div>
+        <div class="capa-title">Guión completo listo para grabar</div>
+        <div class="capa-arrow">▾</div>
+      </div>
+      <div class="capa-body" id="capa4Body"></div>
+    </div>
+
+    <!-- CAPA 5: VIDEO -->
+    <div class="capa" id="capa5">
+      <div class="capa-header" onclick="toggleCapa('capa5')">
+        <div class="capa-icon" style="background:rgba(246,59,246,0.1);">🎬</div>
+        <div class="capa-title">Prompts para clips de video</div>
+        <div class="capa-arrow">▾</div>
+      </div>
+      <div class="capa-body" id="capa5Body"></div>
+    </div>
+
+    <!-- CAPA 6: PUBLICACIÓN -->
+    <div class="capa" id="capa6">
+      <div class="capa-header" onclick="toggleCapa('capa6')">
+        <div class="capa-icon" style="background:rgba(246,200,59,0.12);">📅</div>
+        <div class="capa-title">Cuándo y cómo publicarlo</div>
+        <div class="capa-arrow">▾</div>
+      </div>
+      <div class="capa-body" id="capa6Body"></div>
+    </div>
+
+    <!-- ACCIONES FINALES -->
+    <div class="result-actions">
+      <button class="btn btn-teal" onclick="copiarTodo()">📋 Copiar análisis completo</button>
+      <button class="btn btn-orange" onclick="window.open('https://forms.gle/TU_LINK_AQUI','_blank')">🚀 Quiero acceso anticipado a NEXAFLOW</button>
+      <button class="btn btn-outline" onclick="reiniciar()">↩ Nuevo análisis</button>
+    </div>
+
+  </div><!-- /result -->
+
+</div><!-- /wrap -->
+
+<div class="toast" id="toast"></div>
 
 <script>
-const datos = {}
-const total = 8
-let actual = 1
-let resultadoTextoPlano = ''
+// ═══════════════════════════════════════════
+// DATOS
+// ═══════════════════════════════════════════
+const D = {
+  nombre:'', email:'', nicho:'', subnicho:'', audiencia:'',
+  edad:'', plataformas:[], objetivo:'', friccion:'', tema:'', presencia:''
+};
+let currentStep = 0;
+const TOTAL_STEPS = 9; // 0-8
 
+const SUBNICHOS = {
+  'Crecimiento personal':['Productividad y hábitos','Mindset y mentalidad','Autoestima y confianza','Propósito de vida','Manejo del estrés'],
+  'Marca personal':['Personal branding para profesionales','Creadores de contenido','Coaches y consultores','Líderes y ejecutivos','Freelancers'],
+  'Emprendimiento':['Libertad financiera','Negocios digitales','Startups','Negocios locales','Emprendimiento femenino'],
+  'Marketing digital':['Redes sociales','Email marketing','Copywriting y ventas','SEO y contenido','Publicidad pagada'],
+  'Finanzas':['Inversiones para principiantes','Criptomonedas','Finanzas personales','Libertad financiera','Bienes raíces'],
+  'Salud y bienestar':['Fitness y ejercicio','Nutrición y dieta','Salud mental','Yoga y meditación','Pérdida de peso'],
+  'Educación y aprendizaje':['Aprendizaje de idiomas','Habilidades digitales','Educación para niños','Preparación universitaria','Cursos online'],
+  'Tecnología e IA':['Inteligencia artificial','Programación','Gadgets y tech','Ciberseguridad','No-code y automatización'],
+  'Estilo de vida':['Viajes y aventura','Moda y estilo','Hogar y decoración','Minimalismo','Lujo accesible'],
+  'Espiritualidad':['Meditación','Astrología','Desarrollo espiritual','Budismo y filosofía oriental','Tarot y energía'],
+  'Entretenimiento y cultura':['Humor y comedia','Reseñas y crítica','Cultura pop','Historia','Ciencia curiosa'],
+  'Relaciones':['Pareja y amor','Crianza y familia','Relaciones tóxicas','Autoconocimiento emocional','Comunicación asertiva'],
+};
+
+const AUDIENCIAS_POR_NICHO = {
+  'Crecimiento personal':['Jóvenes que sienten que están perdiendo el tiempo','Profesionales que quieren más de la vida','Personas que salen de una crisis personal','Madres/padres que quieren ser mejor ejemplo'],
+  'Marca personal':['Profesionales que quieren visibilidad sin ser famosos','Freelancers que quieren atraer mejores clientes','Empleados que quieren independizarse'],
+  'Emprendimiento':['Personas con experiencia que quieren digitalizarse','Empleados que quieren su propio negocio','Emprendedores con negocio físico que quieren escalar'],
+  'Marketing digital':['Dueños de negocio que no saben vender online','Creadores sin estrategia de monetización','Profesionales que quieren más clientes'],
+  'Finanzas':['Personas que viven al día y quieren cambiar','Jóvenes que quieren empezar a invertir','Familias que no logran ahorrar'],
+  'Salud y bienestar':['Mujeres mayores de 30 que quieren transformar su cuerpo','Personas sedentarias que quieren empezar','Personas con estrés que afecta su salud'],
+  'Educación y aprendizaje':['Padres que quieren apoyar mejor a sus hijos','Adultos que quieren cambiar de carrera','Jóvenes que quieren habilidades prácticas'],
+  'Tecnología e IA':['Profesionales que quieren adoptar la IA sin ser técnicos','Emprendedores que quieren automatizar','Curiosos de la tecnología'],
+  'Estilo de vida':['Personas que quieren vivir mejor sin gastar más','Viajeros que quieren consejos reales','Personas que quieren rediseñar su vida'],
+  'Espiritualidad':['Personas en búsqueda de paz interior','Profesionales con ansiedad','Personas en transición de vida'],
+  'Entretenimiento y cultura':['Personas que quieren entretenerse y aprender','Fans de la cultura pop','Curiosos que disfrutan el conocimiento'],
+  'Relaciones':['Personas que salen de relaciones tóxicas','Parejas que quieren mejorar su comunicación','Personas solas que quieren conectar'],
+};
+
+// ═══════════════════════════════════════════
+// PROGRESO
+// ═══════════════════════════════════════════
 function buildProgress(){
-  const p = document.getElementById('progress')
-  p.innerHTML = ''
-  for(let i=1;i<=total;i++){
-    const d = document.createElement('div')
-    d.className = 'step-dot' + (i<actual?' done':i===actual?' active':'')
-    p.appendChild(d)
+  const bar = document.getElementById('progressBar');
+  bar.innerHTML='';
+  for(let i=0;i<TOTAL_STEPS;i++){
+    const s=document.createElement('div');
+    s.className='pb-seg'+(i<currentStep?' done':i===currentStep?' active':'');
+    bar.appendChild(s);
   }
 }
 
-function siguiente(n){
-  document.getElementById('p'+actual).classList.remove('activa')
-  actual = n
-  document.getElementById('p'+actual).classList.add('activa')
-  buildProgress()
-  window.scrollTo({top:0,behavior:'smooth'})
+// ═══════════════════════════════════════════
+// NAVEGACIÓN
+// ═══════════════════════════════════════════
+function goTo(n){
+  document.getElementById('s'+currentStep).classList.remove('active');
+  currentStep=n;
+  document.getElementById('s'+n).classList.add('active');
+  buildProgress();
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function seleccionar(campo, btn, valor, btnId){
-  const parent = btn.parentElement
-  parent.querySelectorAll('.opcion').forEach(b=>b.classList.remove('selected'))
-  btn.classList.add('selected')
-  datos[campo] = valor
-  document.getElementById(btnId).disabled = false
+// ═══════════════════════════════════════════
+// VALIDACIONES
+// ═══════════════════════════════════════════
+function check0(){
+  D.nombre=document.getElementById('nombre').value.trim();
+  D.email=document.getElementById('email').value.trim();
+  const ok=D.nombre.length>1&&D.email.includes('@')&&D.email.includes('.');
+  document.getElementById('btn0').disabled=!ok;
+}
+function check1(){
+  D.subnicho=document.getElementById('subnicho').value;
+  document.getElementById('btn1').disabled=!D.nicho||!D.subnicho;
+}
+function checkAudiencia(){
+  const custom=document.getElementById('audienciaCustom').value.trim();
+  if(custom.length>3) D.audiencia=custom;
+  document.getElementById('btn2').disabled=!D.audiencia;
+}
+function check6(){
+  const v=document.getElementById('friccion').value.trim();
+  if(v.length>3) D.friccion=v;
+  document.getElementById('btn6').disabled=!D.friccion;
+}
+function check7(){
+  D.tema=document.getElementById('tema').value.trim();
+  document.getElementById('btn7').disabled=D.tema.length<3;
 }
 
-function verificarInput(campo, btnId){
-  const val = document.getElementById(campo).value.trim()
-  datos[campo] = val
-  document.getElementById(btnId).disabled = val.length < 3
+// ═══════════════════════════════════════════
+// NICHO → SUBNICHO + AUDIENCIA
+// ═══════════════════════════════════════════
+function onNicho(){
+  D.nicho=document.getElementById('nicho').value;
+  D.subnicho='';
+  document.getElementById('btn1').disabled=true;
+  if(!D.nicho){document.getElementById('subnichoWrap').classList.remove('visible');return;}
+  // Subnicho
+  const sel=document.getElementById('subnicho');
+  sel.innerHTML='<option value="">— Selecciona tu subnicho —</option>';
+  (SUBNICHOS[D.nicho]||[]).forEach(s=>{
+    const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o);
+  });
+  document.getElementById('subnichoWrap').classList.add('visible');
+  // Audiencia chips
+  buildAudienciaChips();
+}
+function buildAudienciaChips(){
+  const wrap=document.getElementById('audienciaChips');
+  wrap.innerHTML='';
+  D.audiencia='';
+  document.getElementById('btn2').disabled=true;
+  (AUDIENCIAS_POR_NICHO[D.nicho]||[]).forEach(a=>{
+    const b=document.createElement('button');
+    b.className='chip';
+    b.textContent=a;
+    b.onclick=function(){
+      wrap.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+      b.classList.add('on');
+      D.audiencia=a;
+      document.getElementById('audienciaCustom').value='';
+      document.getElementById('btn2').disabled=false;
+    };
+    wrap.appendChild(b);
+  });
 }
 
-const mensajes = [
-  'Analizando tu perfil...',
-  'Identificando patrones virales...',
-  'Adaptando el tono para tu audiencia...',
-  'Construyendo tus ideas...',
-  'Generando el guión...',
-  'Creando prompts de video...',
-  'Casi listo...'
-]
+// ═══════════════════════════════════════════
+// CHIP HELPERS
+// ═══════════════════════════════════════════
+function selectChip(el,campo,val){
+  el.closest('.chips').querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  D[campo]=val;
+  const btnMap={edad:'btn3',objetivo:'btn5',presencia:'btn8'};
+  if(btnMap[campo]) document.getElementById(btnMap[campo]).disabled=false;
+}
+const selectedPlataformas=new Set();
+function togglePlataforma(el,val){
+  if(selectedPlataformas.has(val)){
+    selectedPlataformas.delete(val);
+    el.classList.remove('on-teal');
+  } else {
+    selectedPlataformas.add(val);
+    el.classList.add('on-teal');
+  }
+  D.plataformas=[...selectedPlataformas];
+  document.getElementById('btn4').disabled=D.plataformas.length===0;
+}
+function setFriccion(el,val){
+  document.querySelectorAll('#s6 .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  D.friccion=val;
+  document.getElementById('friccion').value='';
+  document.getElementById('btn6').disabled=false;
+}
 
-// ─── RENDER: convierte el JSON de 6 capas en HTML legible ───
-function renderResultado(data) {
-  const c1 = data.capa_1_diagnostico
-  const c2 = data.capa_2_ideas
-  const c3 = data.capa_3_seleccion
-  const c4 = data.capa_4_guion
-  const c5 = data.capa_5_prompts_video
-  const c6 = data.capa_6_publicacion
-  const ganadoraId = c3?.id_idea_ganadora
+// ═══════════════════════════════════════════
+// GENERAR ANÁLISIS
+// ═══════════════════════════════════════════
+const loadingSteps=[
+  ['Analizando tu perfil...','Detectando ángulos únicos para tu nicho.'],
+  ['Identificando patrones virales...','Procesando tu audiencia y plataformas.'],
+  ['Generando 10 ideas de contenido...','Aplicando los 10 patrones virales del motor.'],
+  ['Seleccionando la idea ganadora...','Evaluando score de viralidad de cada idea.'],
+  ['Escribiendo tu guión completo...','Ganchos, cuerpo y CTA listos para grabar.'],
+  ['Creando prompts de video...','Instrucciones clip por clip para Meta AI o Grok.'],
+  ['Calculando estrategia de publicación...','Día, hora, métricas y hashtags específicos.'],
+  ['Finalizando tu análisis...','Casi listo. Esto vale mucho más que gratis.'],
+];
+let loadInterval;
 
-  let html = ''
+async function generarAnalisis(){
+  document.getElementById('s8').classList.remove('active');
+  document.getElementById('loading').classList.add('active');
+  buildProgress();
 
-  // ── CAPA 1: Diagnóstico ──
-  if (c1) {
-    html += `<div class="seccion-titulo">📊 Diagnóstico de tu perfil</div>`
-    html += `<div class="bloque">`
-    if (c1.posicionamiento_unico) {
-      html += `<div class="bloque-titulo"><span>Posicionamiento</span></div>`
-      html += `<p style="font-size:14px;color:#CBD5E1;line-height:1.7;margin-bottom:12px">${c1.posicionamiento_unico}</p>`
-    }
-    if (c1.madurez_del_nicho) {
-      html += `<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">`
-      html += `<span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94A3B8">Madurez del nicho:</span>`
-      html += `<span style="font-size:12px;font-weight:700;color:#60A5FA;background:#1B3A6B;padding:2px 8px;border-radius:6px">${c1.madurez_del_nicho}</span>`
-      html += `</div>`
-    }
-    if (c1.ventana_de_oportunidad) {
-      html += `<div style="background:#1B3A6B20;border-left:3px solid #2563EB;padding:10px 12px;border-radius:0 8px 8px 0;margin-top:8px">`
-      html += `<div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#60A5FA;text-transform:uppercase;margin-bottom:4px">Oportunidad actual</div>`
-      html += `<div style="font-size:13px;color:#CBD5E1;line-height:1.6">${c1.ventana_de_oportunidad}</div>`
-      html += `</div>`
-    }
-    if (c1.riesgos_de_contenido?.length) {
-      html += `<div style="margin-top:12px">`
-      html += `<div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#F87171;text-transform:uppercase;margin-bottom:6px">⚠ Riesgos a evitar</div>`
-      c1.riesgos_de_contenido.forEach(r => {
-        html += `<div style="font-size:12px;color:#94A3B8;padding:4px 0;border-bottom:1px solid #1e3a5f">— ${r}</div>`
+  let li=0;
+  loadInterval=setInterval(()=>{
+    const [step,msg]=loadingSteps[li%loadingSteps.length];
+    document.getElementById('loadingStep').textContent=step;
+    document.getElementById('loadingMsg').innerHTML=msg;
+    li++;
+  },2800);
+
+  try{
+    const res=await fetch('/api/diagnostico',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        nombre:D.nombre,
+        email:D.email,
+        nicho:D.nicho+' — '+D.subnicho,
+        audiencia:D.audiencia,
+        edad_audiencia:D.edad,
+        plataforma:D.plataformas.join(', '),
+        objetivo:D.objetivo,
+        friccion:D.friccion,
+        tema:D.tema,
+        presencia:D.presencia,
       })
-      html += `</div>`
-    }
-    html += `</div>`
-  }
+    });
+    clearInterval(loadInterval);
+    const data=await res.json();
+    document.getElementById('loading').classList.remove('active');
 
-  // ── CAPA 2: Ideas ──
-  if (c2?.length) {
-    html += `<div class="seccion-titulo">💡 Tus 10 ideas de contenido</div>`
-    html += `<div class="tab-hint">La idea ganadora está marcada en verde</div>`
-    c2.forEach(idea => {
-      const esGanadora = idea.id === ganadoraId
-      const scoreAlto = idea.score_viralidad >= 75
-      html += `<div class="idea-card ${esGanadora?'ganadora':''}">`
-      if (esGanadora) html += `<div class="badge-ganadora">⭐ IDEA GANADORA</div>`
-      html += `<div class="idea-tipo">${idea.tipo} · ${idea.formato_recomendado} · ${idea.duracion_recomendada}</div>`
-      html += `<div class="idea-header">`
-      html += `<div class="idea-titulo">${idea.titulo}</div>`
-      html += `<div class="idea-score ${scoreAlto?'alto':''}">${idea.score_viralidad}/100</div>`
-      html += `</div>`
-      if (idea.hook_apertura) html += `<div class="idea-hook">"${idea.hook_apertura}"</div>`
-      if (idea.emocion_dominante) html += `<div class="idea-emocion">${idea.emocion_dominante}</div>`
-      if (idea.justificacion_viralidad) {
-        html += `<div style="font-size:11px;color:#64748B;margin-top:8px;line-height:1.5">${idea.justificacion_viralidad}</div>`
-      }
-      html += `</div>`
-    })
-
-    // Razón de selección
-    if (c3?.razon_seleccion) {
-      html += `<div class="bloque" style="border-color:#0F766E">`
-      html += `<div class="bloque-titulo"><span>¿Por qué esta idea?</span></div>`
-      html += `<p style="font-size:13px;color:#CBD5E1;line-height:1.7;margin-bottom:8px">${c3.razon_seleccion}</p>`
-      if (c3.factor_decisivo) {
-        html += `<div style="font-size:11px;color:#34D399;font-weight:700">Factor decisivo: ${c3.factor_decisivo}</div>`
-      }
-      html += `</div>`
-    }
-  }
-
-  // ── CAPA 4: Guión ──
-  if (c4) {
-    html += `<div class="seccion-titulo">🎬 Guión completo</div>`
-    html += `<div class="bloque">`
-
-    // Ganchos
-    const ganchos = [c4.gancho_opcion_1, c4.gancho_opcion_2, c4.gancho_opcion_3].filter(Boolean)
-    if (ganchos.length) {
-      html += `<span class="guion-label">Opciones de gancho</span>`
-      ganchos.forEach((g, i) => {
-        const esRecomendado = (i+1) === c4.gancho_recomendado
-        html += `<div class="guion-gancho ${esRecomendado?'recomendado':''}">`
-        if (esRecomendado) html += `<div style="font-size:10px;color:#34D399;font-weight:700;margin-bottom:4px">✓ RECOMENDADO</div>`
-        html += `${g}</div>`
-      })
-      if (c4.razon_gancho_recomendado) {
-        html += `<div style="font-size:11px;color:#64748B;margin-bottom:12px;font-style:italic">${c4.razon_gancho_recomendado}</div>`
-      }
-    }
-
-    // Cuerpo
-    if (c4.cuerpo) {
-      html += `<span class="guion-label">Cuerpo del contenido</span>`
-      html += `<div class="guion-cuerpo">${c4.cuerpo.replace(/\n/g,'<br>')}</div>`
-    }
-
-    // CTA
-    if (c4.cta) {
-      html += `<span class="guion-label">Llamada a la acción</span>`
-      html += `<div class="guion-cta">${c4.cta}</div>`
-    }
-
-    // Meta del guión
-    html += `<div class="guion-meta">`
-    if (c4.palabras_totales_guion) html += `<span class="meta-tag">~${c4.palabras_totales_guion} palabras</span>`
-    if (c4.duracion_estimada_segundos) html += `<span class="meta-tag">~${c4.duracion_estimada_segundos}s</span>`
-    html += `</div>`
-    html += `</div>`
-  }
-
-  // ── CAPA 5: Prompts de video ──
-  if (c5?.clips?.length) {
-    html += `<div class="seccion-titulo">🎥 Prompts para clips de video</div>`
-    if (c5.estilo_visual_global) {
-      html += `<div style="font-size:12px;color:#94A3B8;margin-bottom:10px;line-height:1.6;background:#0f172a;padding:10px;border-radius:8px">`
-      html += `<strong style="color:#60A5FA">Estilo global:</strong> ${c5.estilo_visual_global}`
-      if (c5.paleta_de_color?.length) {
-        html += ` · <strong style="color:#60A5FA">Paleta:</strong> ${c5.paleta_de_color.join(', ')}`
-      }
-      html += `</div>`
-    }
-    c5.clips.forEach(clip => {
-      html += `<div class="clip-card">`
-      html += `<div class="clip-segundos">⏱ ${clip.segundos}</div>`
-      if (clip.frase_del_guion) html += `<div class="clip-frase">"${clip.frase_del_guion}"</div>`
-      if (clip.prompt_imagen) {
-        html += `<span class="clip-prompt-label">🖼 Imagen</span>`
-        html += `<div class="clip-prompt">${clip.prompt_imagen}</div>`
-      }
-      if (clip.prompt_animacion) {
-        html += `<span class="clip-prompt-label">🎞 Animación</span>`
-        html += `<div class="clip-prompt">${clip.prompt_animacion}</div>`
-      }
-      html += `</div>`
-    })
-  }
-
-  // ── CAPA 6: Publicación ──
-  if (c6) {
-    html += `<div class="seccion-titulo">📅 Cuándo publicar</div>`
-    html += `<div class="bloque">`
-    html += `<div class="pub-grid">`
-    if (c6.dia_recomendado) html += `<div class="pub-item"><div class="pub-item-label">Día</div><div class="pub-item-valor">${c6.dia_recomendado}</div></div>`
-    if (c6.hora_recomendada) html += `<div class="pub-item"><div class="pub-item-label">Hora</div><div class="pub-item-valor">${c6.hora_recomendada}</div></div>`
-    if (c6.frecuencia_ideal) html += `<div class="pub-item"><div class="pub-item-label">Frecuencia</div><div class="pub-item-valor">${c6.frecuencia_ideal}</div></div>`
-    if (c6.metrica_principal) html += `<div class="pub-item"><div class="pub-item-label">Métrica clave</div><div class="pub-item-valor" style="font-size:12px">${c6.metrica_principal}</div></div>`
-    html += `</div>`
-    if (c6.razon_timing) {
-      html += `<div style="font-size:12px;color:#94A3B8;line-height:1.6;margin-bottom:10px">${c6.razon_timing}</div>`
-    }
-    if (c6.umbral_de_exito_24h) {
-      html += `<div style="background:#1B3A6B20;border-radius:8px;padding:10px;margin-bottom:8px">`
-      html += `<div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#60A5FA;margin-bottom:4px">Umbral de éxito 24h</div>`
-      html += `<div style="font-size:13px;color:#CBD5E1">${c6.umbral_de_exito_24h}</div>`
-      html += `</div>`
-    }
-    if (c6.accion_si_supera_umbral || c6.accion_si_no_supera_umbral) {
-      html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">`
-      if (c6.accion_si_supera_umbral) {
-        html += `<div style="background:#0d2420;border-radius:8px;padding:10px">`
-        html += `<div style="font-size:10px;font-weight:700;color:#34D399;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">✓ Si supera</div>`
-        html += `<div style="font-size:11px;color:#CBD5E1;line-height:1.5">${c6.accion_si_supera_umbral}</div>`
-        html += `</div>`
-      }
-      if (c6.accion_si_no_supera_umbral) {
-        html += `<div style="background:#2d1515;border-radius:8px;padding:10px">`
-        html += `<div style="font-size:10px;font-weight:700;color:#F87171;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">✗ Si no supera</div>`
-        html += `<div style="font-size:11px;color:#CBD5E1;line-height:1.5">${c6.accion_si_no_supera_umbral}</div>`
-        html += `</div>`
-      }
-      html += `</div>`
-    }
-    if (c6.hashtags_recomendados?.length) {
-      html += `<div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#60A5FA;margin-bottom:6px">Hashtags</div>`
-      html += `<div class="hashtags">`
-      c6.hashtags_recomendados.forEach(h => {
-        html += `<span class="hashtag">${h.startsWith('#')?h:'#'+h}</span>`
-      })
-      html += `</div>`
-    }
-    html += `</div>`
-  }
-
-  // ── BOTONES ──
-  html += `<button class="btn-copiar" onclick="copiarGuion()">📋 Copiar guión completo</button>`
-  html += `<button class="btn-lista" onclick="window.open('https://forms.gle/TU_LINK_AQUI','_blank')">🚀 Quiero acceso anticipado a NEXAFLOW</button>`
-  html += `<button class="btn-nueva" onclick="reiniciar()">↩ Generar con otra idea</button>`
-
-  return html
-}
-
-// ─── Extrae el guión como texto para copiar ───
-function copiarGuion() {
-  if (!resultadoTextoPlano) return
-  navigator.clipboard.writeText(resultadoTextoPlano).then(() => {
-    const btns = document.querySelectorAll('.btn-copiar')
-    btns.forEach(b => {
-      b.textContent = '✅ ¡Copiado!'
-      setTimeout(() => b.textContent = '📋 Copiar guión completo', 2000)
-    })
-  })
-}
-
-async function generar(){
-  document.getElementById('p8').classList.remove('activa')
-  document.getElementById('cargando').style.display = 'block'
-  document.getElementById('resultado').innerHTML = ''
-  document.getElementById('resultado').style.display = 'none'
-  buildProgress()
-
-  let mi = 0
-  const interval = setInterval(() => {
-    document.getElementById('msg-carga').textContent = mensajes[mi % mensajes.length]
-    mi++
-  }, 2200)
-
-  try {
-    const res = await fetch('/api/diagnostico', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        nicho: datos.nicho || '',
-        audiencia: datos.audiencia || '',
-        edad_audiencia: datos.edad_audiencia || '',
-        plataforma: datos.plataforma || '',
-        objetivo: datos.objetivo || '',
-        friccion: datos.friccion || '',
-        tema: datos.tema || '',
-        presencia: datos.presencia || ''
-      })
-    })
-
-    const d = await res.json()
-    clearInterval(interval)
-    document.getElementById('cargando').style.display = 'none'
-    const resultadoDiv = document.getElementById('resultado')
-    resultadoDiv.style.display = 'block'
-
-    if (d.success && d.resultado) {
-      // Guardar texto plano del guión para copiar
-      const c4 = d.resultado.capa_4_guion
-      if (c4) {
-        const ganchoIdx = c4.gancho_recomendado || 1
-        const ganchoTexto = c4[`gancho_opcion_${ganchoIdx}`] || c4.gancho_opcion_1 || ''
-        resultadoTextoPlano = [ganchoTexto, c4.cuerpo, c4.cta].filter(Boolean).join('\n\n')
-      }
-      resultadoDiv.innerHTML = renderResultado(d.resultado)
+    if(data.success && data.resultado){
+      renderResultado(data.resultado, data.usuario);
     } else {
-      // Error de la API — mostrar mensaje útil
-      const mensajeError = d.message || d.error || 'Error desconocido'
-      resultadoDiv.innerHTML = `
-        <div class="error-box">
-          <strong>Algo salió mal</strong><br><br>
-          ${mensajeError}<br><br>
-          <small style="color:#94A3B8">Código: ${d.error || res.status}</small>
-        </div>
-        <button class="btn-nueva" onclick="reiniciar()" style="margin-top:12px">↩ Intentar de nuevo</button>
-      `
+      mostrarError(data.message||'Error generando el análisis. Intenta de nuevo.');
     }
-  } catch(e) {
-    clearInterval(interval)
-    document.getElementById('cargando').style.display = 'none'
-    const resultadoDiv = document.getElementById('resultado')
-    resultadoDiv.style.display = 'block'
-    resultadoDiv.innerHTML = `
-      <div class="error-box">
-        <strong>Error de conexión</strong><br><br>
-        No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.<br><br>
-        <small style="color:#94A3B8">${e.message}</small>
-      </div>
-      <button class="btn-nueva" onclick="reiniciar()" style="margin-top:12px">↩ Intentar de nuevo</button>
-    `
+  }catch(e){
+    clearInterval(loadInterval);
+    document.getElementById('loading').classList.remove('active');
+    mostrarError('Error de conexión. Verifica tu internet e intenta de nuevo.');
   }
 }
 
-function reiniciar(){
-  Object.keys(datos).forEach(k => delete datos[k])
-  resultadoTextoPlano = ''
-  actual = 1
-  document.getElementById('resultado').style.display = 'none'
-  document.getElementById('resultado').innerHTML = ''
-  document.querySelectorAll('.pregunta').forEach(p => p.classList.remove('activa'))
-  document.querySelectorAll('.opcion').forEach(b => b.classList.remove('selected'))
-  document.querySelectorAll('.btn-siguiente').forEach(b => b.disabled = true)
-  document.getElementById('nicho').value = ''
-  document.getElementById('audiencia').value = ''
-  document.getElementById('friccion').value = ''
-  document.getElementById('tema').value = ''
-  document.getElementById('p1').classList.add('activa')
-  buildProgress()
-  window.scrollTo({top:0,behavior:'smooth'})
+function mostrarError(msg){
+  document.getElementById('s8').classList.add('active');
+  showToast('⚠️ '+msg);
 }
 
-buildProgress()
+// ═══════════════════════════════════════════
+// RENDER RESULTADO
+// ═══════════════════════════════════════════
+function renderResultado(r, usuario){
+  document.getElementById('result').classList.add('active');
+  document.getElementById('resultTitle').textContent=
+    `${usuario?.nombre ? usuario.nombre+', tu' : 'Tu'} análisis está listo`;
+  document.getElementById('resultSub').textContent=
+    `${r.capa_2_ideas?.length||0} ideas generadas · Idea ganadora seleccionada · Guión completo`;
+
+  renderCapa1(r.capa_1_diagnostico);
+  renderCapa2(r.capa_2_ideas, r.capa_3_seleccion);
+  renderCapa4(r.capa_4_guion);
+  renderCapa5(r.capa_5_prompts_video);
+  renderCapa6(r.capa_6_publicacion);
+
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderCapa1(d){
+  if(!d){document.getElementById('capa1Body').innerHTML='<p style="color:var(--muted);font-size:13px;padding-top:12px;">No se generó el diagnóstico.</p>';return;}
+  document.getElementById('capa1Body').innerHTML=`
+    <div class="diag-full" style="margin-top:14px;">
+      <div class="label">Posicionamiento único</div>
+      ${d.posicionamiento_unico||'—'}
+    </div>
+    <div class="diag-grid">
+      <div class="diag-item">
+        <div class="label">Madurez del nicho</div>
+        <div class="val">${d.madurez_del_nicho||'—'}</div>
+      </div>
+      <div class="diag-item">
+        <div class="label">Ventana de oportunidad</div>
+        <div class="val">${d.ventana_de_oportunidad||'—'}</div>
+      </div>
+    </div>
+    <div class="diag-full">
+      <div class="label">⚠️ Riesgos a evitar</div>
+      ${(d.riesgos_de_contenido||[]).map(r=>`
+        <div class="risk-item"><div class="risk-dot"></div><span>${r}</span></div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderCapa2(ideas, seleccion){
+  if(!ideas||!ideas.length){document.getElementById('capa2Body').innerHTML='<p style="color:var(--muted);font-size:13px;padding-top:12px;">No se generaron ideas.</p>';return;}
+  const ganadoraId=seleccion?.id_idea_ganadora;
+  const ganadora=ideas.find(i=>i.id===ganadoraId)||ideas[0];
+  let html=`
+    <div class="idea-winner">
+      <div class="winner-badge">★ IDEA GANADORA</div>
+      <div class="idea-title">${ganadora.titulo||'—'}</div>
+      <div class="idea-meta">
+        <span class="tag blue">${ganadora.patron_viral_aplicado||''}</span>
+        <span class="tag teal">${ganadora.formato_recomendado||''}</span>
+        <span class="tag orange">${ganadora.emocion_dominante||''}</span>
+        <span class="tag">${ganadora.duracion_recomendada||''}</span>
+      </div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">${ganadora.insight_mensaje_central||''}</div>
+      <div style="font-size:12px;color:var(--accent2);margin-bottom:4px;">Hook: "${ganadora.hook_apertura||''}"</div>
+      <div style="font-size:11px;color:var(--muted);">Score de viralidad: ${ganadora.score_viralidad||0}/100 — ${ganadora.justificacion_viralidad||''}</div>
+      <div class="score-bar"><div class="score-fill" style="width:${ganadora.score_viralidad||0}%"></div></div>
+    </div>
+  `;
+  if(seleccion){
+    html+=`
+      <div class="diag-full" style="margin-top:10px;">
+        <div class="label">¿Por qué esta idea?</div>
+        ${seleccion.razon_seleccion||''}<br>
+        <span style="color:var(--accent2);font-size:12px;">Factor decisivo: ${seleccion.factor_decisivo||''}</span>
+      </div>
+    `;
+  }
+  html+=`<div class="section-title">Las 10 ideas (ordenadas por score)</div><div class="ideas-list">`;
+  ideas.forEach(idea=>{
+    if(idea.id===ganadoraId) return;
+    html+=`
+      <div class="idea-row">
+        <div class="ir-top">
+          <div class="ir-title">${idea.titulo||'—'}</div>
+          <div class="ir-score">${idea.score_viralidad||0}</div>
+        </div>
+        <div class="ir-meta">${idea.patron_viral_aplicado||''} · ${idea.formato_recomendado||''} · ${idea.emocion_dominante||''}</div>
+      </div>
+    `;
+  });
+  html+=`</div>`;
+  document.getElementById('capa2Body').innerHTML=html;
+}
+
+function renderCapa4(g){
+  if(!g){document.getElementById('capa4Body').innerHTML='<p style="color:var(--muted);font-size:13px;padding-top:12px;">No se generó el guión.</p>';return;}
+  const ganchos=[g.gancho_opcion_1,g.gancho_opcion_2,g.gancho_opcion_3];
+  const rec=g.gancho_recomendado||1;
+  let html=`<div class="section-title" style="margin-top:14px;">3 opciones de gancho (hook)</div>`;
+  ganchos.forEach((txt,i)=>{
+    if(!txt) return;
+    const isRec=(i+1)===rec;
+    html+=`
+      <div class="gancho-opt${isRec?' recommended':''}">
+        ${isRec?'<div class="rec-badge">RECOMENDADO</div>':''}
+        <div class="gancho-text">"${txt}"</div>
+      </div>
+    `;
+  });
+  if(g.razon_gancho_recomendado){
+    html+=`<div style="font-size:12px;color:var(--muted);margin-top:4px;padding:0 4px;">${g.razon_gancho_recomendado}</div>`;
+  }
+  html+=`
+    <div class="section-title">Cuerpo del contenido</div>
+    <div class="cuerpo-box">${g.cuerpo||''}</div>
+    <div class="cta-box">
+      <div class="label">🎯 Llamada a la acción</div>
+      ${g.cta||''}
+    </div>
+    <div class="duracion-info">
+      <div class="dur-chip"><strong>${g.palabras_totales_guion||0}</strong>palabras totales</div>
+      <div class="dur-chip"><strong>${g.duracion_estimada_segundos||0}s</strong>duración estimada</div>
+    </div>
+  `;
+  document.getElementById('capa4Body').innerHTML=html;
+}
+
+function renderCapa5(v){
+  if(!v||!v.clips||!v.clips.length){document.getElementById('capa5Body').innerHTML='<p style="color:var(--muted);font-size:13px;padding-top:12px;">No se generaron los prompts de video.</p>';return;}
+  let html=`
+    <div class="diag-full" style="margin-top:14px;">
+      <div class="label">Estilo visual global</div>
+      ${v.estilo_visual_global||''}
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+        ${(v.paleta_de_color||[]).map(c=>`<span class="tag">${c}</span>`).join('')}
+      </div>
+    </div>
+    <div class="section-title">${v.total_clips||0} clips — listo para Meta AI o Grok</div>
+  `;
+  v.clips.forEach(clip=>{
+    html+=`
+      <div class="clip-item">
+        <div class="clip-header">
+          <div class="clip-num">${clip.fragmento_id}</div>
+          <div class="clip-time">${clip.segundos||''}</div>
+        </div>
+        <div class="clip-frase">"${clip.frase_del_guion||''}"</div>
+        <div class="clip-prompts">
+          <div class="prompt-block">
+            <div class="pl">📸 Prompt imagen</div>
+            <p>${clip.prompt_imagen||''}</p>
+            <button class="btn-copy-prompt" onclick="copyText('${escJS(clip.prompt_imagen||'')}')">Copiar</button>
+          </div>
+          <div class="prompt-block">
+            <div class="pl">🎬 Prompt animación</div>
+            <p>${clip.prompt_animacion||''}</p>
+            <button class="btn-copy-prompt" onclick="copyText('${escJS(clip.prompt_animacion||'')}')">Copiar</button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  document.getElementById('capa5Body').innerHTML=html;
+}
+
+function renderCapa6(p){
+  if(!p){document.getElementById('capa6Body').innerHTML='<p style="color:var(--muted);font-size:13px;padding-top:12px;">No se generó la estrategia de publicación.</p>';return;}
+  let html=`
+    <div class="pub-grid">
+      <div class="pub-item">
+        <div class="label">Día recomendado</div>
+        <div class="val">${p.dia_recomendado||'—'}</div>
+      </div>
+      <div class="pub-item">
+        <div class="label">Hora ideal</div>
+        <div class="val">${p.hora_recomendada||'—'}</div>
+      </div>
+      <div class="pub-item">
+        <div class="label">Frecuencia</div>
+        <div class="val">${p.frecuencia_ideal||'—'}</div>
+      </div>
+      <div class="pub-item">
+        <div class="label">Métrica principal</div>
+        <div class="val" style="font-size:12px;">${p.metrica_principal||'—'}</div>
+      </div>
+    </div>
+    <div class="diag-full">
+      <div class="label">¿Por qué ese día y hora?</div>
+      ${p.razon_timing||''}
+    </div>
+    <div class="acciones-box">
+      <div class="label">Umbral de éxito en 24h: ${p.umbral_de_exito_24h||''}</div>
+      <div class="accion-row">
+        <div class="accion-dot" style="background:var(--accent2)"></div>
+        <span><strong style="color:var(--accent2)">Si supera:</strong> ${p.accion_si_supera_umbral||''}</span>
+      </div>
+      <div class="accion-row">
+        <div class="accion-dot" style="background:var(--danger)"></div>
+        <span><strong style="color:var(--danger)">Si no llega:</strong> ${p.accion_si_no_supera_umbral||''}</span>
+      </div>
+    </div>
+    <div class="section-title">Hashtags recomendados</div>
+    <div class="hashtags">
+      ${(p.hashtags_recomendados||[]).map(h=>`<span class="ht">${h.startsWith('#')?h:'#'+h}</span>`).join('')}
+    </div>
+  `;
+  document.getElementById('capa6Body').innerHTML=html;
+}
+
+// ═══════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════
+function toggleCapa(id){
+  document.getElementById(id).classList.toggle('open');
+}
+function copyText(txt){
+  navigator.clipboard.writeText(txt).then(()=>showToast('✅ Copiado al portapapeles'));
+}
+function escJS(s){return s.replace(/'/g,"\\'").replace(/\n/g,' ');}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+function copiarTodo(){
+  const el=document.getElementById('result');
+  const text=el.innerText;
+  navigator.clipboard.writeText(text).then(()=>showToast('✅ Análisis completo copiado'));
+}
+function reiniciar(){
+  Object.keys(D).forEach(k=>D[k]=k==='plataformas'?[]:'' );
+  selectedPlataformas.clear();
+  currentStep=0;
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('loading').classList.remove('active');
+  document.getElementById('result').classList.remove('active');
+  document.getElementById('s0').classList.add('active');
+  document.getElementById('nombre').value='';
+  document.getElementById('email').value='';
+  document.getElementById('btn0').disabled=true;
+  document.querySelectorAll('.chip').forEach(c=>{c.classList.remove('on');c.classList.remove('on-teal');});
+  document.getElementById('subnichoWrap').classList.remove('visible');
+  buildProgress();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+buildProgress();
 </script>
 </body>
 </html>
