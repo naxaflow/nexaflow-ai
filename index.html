@@ -5,9 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NEXAFLOW AI — Diagnóstico de Contenido</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
+
 *{box-sizing:border-box;margin:0;padding:0;}
 body{
-  font-family:Arial,sans-serif;
+  font-family:'Syne',sans-serif;
   background:#0D1B2A;
   color:white;
   min-height:100vh;
@@ -25,181 +27,183 @@ body{
   margin:20px auto;
   box-shadow:0 10px 40px rgba(0,0,0,0.5);
 }
-.logo{
-  text-align:center;
-  margin-bottom:8px;
-}
-.logo h1{
-  font-size:22px;
-  font-weight:900;
-  color:#60A5FA;
-  letter-spacing:2px;
-}
-.logo p{
-  font-size:13px;
-  color:#94A3B8;
-  margin-top:4px;
-}
-.progress{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:6px;
-  margin:20px 0;
-}
-.step-dot{
-  width:10px;height:10px;
-  border-radius:50%;
-  background:#334155;
-  transition:all 0.3s;
-}
+.logo{text-align:center;margin-bottom:8px;}
+.logo h1{font-size:22px;font-weight:900;color:#60A5FA;letter-spacing:2px;}
+.logo p{font-size:13px;color:#94A3B8;margin-top:4px;}
+.progress{display:flex;justify-content:center;align-items:center;gap:6px;margin:20px 0;}
+.step-dot{width:10px;height:10px;border-radius:50%;background:#334155;transition:all 0.3s;}
 .step-dot.active{background:#2563EB;}
 .step-dot.done{background:#0F766E;}
 .pregunta{display:none;}
 .pregunta.activa{display:block;}
-.pregunta h2{
-  font-size:17px;
-  font-weight:700;
-  color:#E2E8F0;
-  margin-bottom:6px;
-  line-height:1.4;
+.pregunta h2{font-size:17px;font-weight:700;color:#E2E8F0;margin-bottom:6px;line-height:1.4;}
+.pregunta p{font-size:13px;color:#94A3B8;margin-bottom:16px;}
+input,textarea{
+  width:100%;padding:14px;border-radius:10px;border:2px solid #334155;
+  background:#0f172a;color:white;font-size:15px;outline:none;
+  transition:border 0.2s;resize:none;font-family:'Syne',sans-serif;
 }
-.pregunta p{
-  font-size:13px;
-  color:#94A3B8;
-  margin-bottom:16px;
-}
-input, textarea{
-  width:100%;
-  padding:14px;
-  border-radius:10px;
-  border:2px solid #334155;
-  background:#0f172a;
-  color:white;
-  font-size:15px;
-  outline:none;
-  transition:border 0.2s;
-  resize:none;
-}
-input:focus, textarea:focus{border-color:#2563EB;}
-.opciones{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-top:4px;
-}
+input:focus,textarea:focus{border-color:#2563EB;}
+.opciones{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;}
 .opcion{
-  padding:10px 16px;
-  border-radius:20px;
-  border:2px solid #334155;
-  background:transparent;
-  color:#CBD5E1;
-  font-size:14px;
-  cursor:pointer;
-  transition:all 0.2s;
+  padding:10px 16px;border-radius:20px;border:2px solid #334155;
+  background:transparent;color:#CBD5E1;font-size:14px;cursor:pointer;
+  transition:all 0.2s;font-family:'Syne',sans-serif;
 }
 .opcion:hover{border-color:#2563EB;color:white;}
-.opcion.selected{
-  border-color:#2563EB;
-  background:#1B3A6B;
-  color:white;
-  font-weight:bold;
-}
+.opcion.selected{border-color:#2563EB;background:#1B3A6B;color:white;font-weight:bold;}
 .btn-siguiente{
-  width:100%;
-  margin-top:20px;
-  padding:14px;
-  border-radius:10px;
-  border:none;
-  background:#2563EB;
-  color:white;
-  font-weight:bold;
-  font-size:16px;
-  cursor:pointer;
-  transition:background 0.2s;
+  width:100%;margin-top:20px;padding:14px;border-radius:10px;border:none;
+  background:#2563EB;color:white;font-weight:bold;font-size:16px;cursor:pointer;
+  transition:background 0.2s;font-family:'Syne',sans-serif;
 }
 .btn-siguiente:hover{background:#1B3A6B;}
 .btn-siguiente:disabled{background:#334155;cursor:not-allowed;}
-.cargando{
-  text-align:center;
-  padding:40px 0;
-  display:none;
-}
-.cargando p{
-  color:#94A3B8;
-  font-size:14px;
-  margin-top:16px;
-}
+
+/* CARGANDO */
+.cargando{text-align:center;padding:40px 0;display:none;}
+.cargando p{color:#94A3B8;font-size:14px;margin-top:16px;}
 .spinner{
-  width:40px;height:40px;
-  border:4px solid #334155;
-  border-top:4px solid #2563EB;
-  border-radius:50%;
-  animation:spin 1s linear infinite;
-  margin:0 auto;
+  width:40px;height:40px;border:4px solid #334155;border-top:4px solid #2563EB;
+  border-radius:50%;animation:spin 1s linear infinite;margin:0 auto;
 }
 @keyframes spin{to{transform:rotate(360deg);}}
-.resultado{
-  display:none;
-  margin-top:8px;
+
+/* RESULTADO */
+.resultado{display:none;margin-top:8px;}
+
+/* Diagnóstico (Capa 1) */
+.bloque{background:#0f172a;border-radius:12px;padding:18px;margin-bottom:14px;border:1px solid #1e3a5f;}
+.bloque-titulo{
+  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:#60A5FA;margin-bottom:12px;display:flex;align-items:center;gap:8px;
 }
-.resultado-texto{
-  background:#0f172a;
-  padding:20px;
-  border-radius:10px;
-  white-space:pre-line;
-  line-height:1.7;
-  font-size:14px;
-  color:#E2E8F0;
-  border:1px solid #1B3A6B;
+.bloque-titulo span{background:#1B3A6B;padding:3px 8px;border-radius:6px;}
+
+/* Ideas */
+.idea-card{
+  background:#0f172a;border:1px solid #1e3a5f;border-radius:10px;
+  padding:14px;margin-bottom:10px;cursor:pointer;transition:all 0.2s;
 }
+.idea-card:hover{border-color:#2563EB;}
+.idea-card.ganadora{border-color:#0F766E;background:#0d2420;}
+.idea-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.idea-tipo{
+  font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:#94A3B8;margin-bottom:4px;
+}
+.idea-titulo{font-size:14px;font-weight:700;color:#E2E8F0;line-height:1.4;}
+.idea-score{
+  font-family:'Space Mono',monospace;font-size:13px;font-weight:700;
+  color:#60A5FA;white-space:nowrap;background:#1B3A6B;
+  padding:4px 8px;border-radius:6px;flex-shrink:0;
+}
+.idea-score.alto{color:#34D399;background:#0d2420;}
+.idea-hook{
+  font-size:12px;color:#94A3B8;margin-top:8px;font-style:italic;
+  border-left:2px solid #334155;padding-left:8px;line-height:1.5;
+}
+.idea-emocion{
+  display:inline-block;margin-top:8px;font-size:11px;font-weight:600;
+  padding:3px 10px;border-radius:20px;background:#1B3A6B;color:#93C5FD;
+}
+.badge-ganadora{
+  display:inline-block;font-size:10px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;background:#0F766E;color:white;
+  padding:3px 8px;border-radius:6px;margin-bottom:6px;
+}
+
+/* Guión */
+.guion-gancho{
+  background:#1B3A6B;border-radius:8px;padding:12px 14px;margin-bottom:8px;
+  font-size:14px;font-weight:700;color:#E2E8F0;line-height:1.5;
+  border-left:3px solid #2563EB;
+}
+.guion-gancho.recomendado{border-left-color:#34D399;background:#0d2420;}
+.guion-label{
+  font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:#60A5FA;margin-bottom:6px;display:block;
+}
+.guion-cuerpo{
+  font-size:14px;color:#CBD5E1;line-height:1.8;
+  background:#0f172a;border-radius:8px;padding:14px;margin-bottom:10px;
+}
+.guion-cta{
+  font-size:14px;font-weight:700;color:#34D399;
+  background:#0d2420;border-radius:8px;padding:12px 14px;
+  border-left:3px solid #0F766E;
+}
+.guion-meta{
+  display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;
+}
+.meta-tag{
+  font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;
+  background:#334155;color:#94A3B8;
+}
+
+/* Prompts Video */
+.clip-card{
+  background:#0f172a;border:1px solid #1e3a5f;border-radius:10px;
+  padding:14px;margin-bottom:10px;
+}
+.clip-segundos{
+  font-family:'Space Mono',monospace;font-size:11px;color:#60A5FA;
+  font-weight:700;margin-bottom:6px;
+}
+.clip-frase{
+  font-size:13px;font-style:italic;color:#94A3B8;
+  margin-bottom:10px;border-left:2px solid #334155;padding-left:8px;
+}
+.clip-prompt{
+  font-size:12px;color:#CBD5E1;line-height:1.6;
+  background:#1B3A6B20;border-radius:6px;padding:10px;margin-bottom:6px;
+}
+.clip-prompt-label{
+  font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  color:#60A5FA;margin-bottom:4px;display:block;
+}
+
+/* Publicación */
+.pub-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.pub-item{background:#1B3A6B20;border-radius:8px;padding:12px;}
+.pub-item-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#60A5FA;margin-bottom:4px;}
+.pub-item-valor{font-size:14px;font-weight:700;color:#E2E8F0;}
+.hashtags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.hashtag{font-size:12px;background:#1B3A6B;color:#93C5FD;padding:4px 10px;border-radius:20px;}
+.seccion-titulo{
+  font-size:13px;font-weight:700;color:#60A5FA;margin:18px 0 10px;
+  text-transform:uppercase;letter-spacing:1.5px;display:flex;align-items:center;gap:8px;
+}
+.seccion-titulo::after{content:'';flex:1;height:1px;background:#1e3a5f;}
+
+/* Botones resultado */
 .btn-copiar{
-  width:100%;
-  margin-top:12px;
-  padding:14px;
-  border-radius:10px;
-  border:2px solid #0F766E;
-  background:transparent;
-  color:#0F766E;
-  font-weight:bold;
-  font-size:15px;
-  cursor:pointer;
-  transition:all 0.2s;
+  width:100%;margin-top:12px;padding:14px;border-radius:10px;border:2px solid #0F766E;
+  background:transparent;color:#0F766E;font-weight:bold;font-size:15px;
+  cursor:pointer;transition:all 0.2s;font-family:'Syne',sans-serif;
 }
 .btn-copiar:hover{background:#0F766E;color:white;}
 .btn-lista{
-  width:100%;
-  margin-top:10px;
-  padding:14px;
-  border-radius:10px;
-  border:none;
-  background:#B45309;
-  color:white;
-  font-weight:bold;
-  font-size:15px;
-  cursor:pointer;
-  transition:background 0.2s;
+  width:100%;margin-top:10px;padding:14px;border-radius:10px;border:none;
+  background:#B45309;color:white;font-weight:bold;font-size:15px;
+  cursor:pointer;transition:background 0.2s;font-family:'Syne',sans-serif;
 }
 .btn-lista:hover{background:#92400E;}
 .btn-nueva{
-  width:100%;
-  margin-top:10px;
-  padding:12px;
-  border-radius:10px;
-  border:2px solid #334155;
-  background:transparent;
-  color:#94A3B8;
-  font-size:14px;
-  cursor:pointer;
-  transition:all 0.2s;
+  width:100%;margin-top:10px;padding:12px;border-radius:10px;border:2px solid #334155;
+  background:transparent;color:#94A3B8;font-size:14px;cursor:pointer;
+  transition:all 0.2s;font-family:'Syne',sans-serif;
 }
 .btn-nueva:hover{border-color:#94A3B8;color:white;}
-.contador{
-  font-size:12px;
-  color:#64748B;
-  text-align:right;
-  margin-top:4px;
+
+.error-box{
+  background:#2d1515;border:1px solid #7f1d1d;border-radius:10px;
+  padding:16px;color:#FCA5A5;font-size:14px;line-height:1.6;
 }
+
+/* Tabs para ideas */
+.tab-container{margin-bottom:4px;}
+.tab-hint{font-size:11px;color:#64748B;margin-bottom:8px;text-align:center;}
 </style>
 </head>
 <body>
@@ -309,12 +313,7 @@ input:focus, textarea:focus{border-color:#2563EB;}
   </div>
 
   <!-- RESULTADO -->
-  <div class="resultado" id="resultado">
-    <div class="resultado-texto" id="texto-resultado"></div>
-    <button class="btn-copiar" onclick="copiar()">📋 Copiar todo</button>
-    <button class="btn-lista" onclick="window.open('https://forms.gle/TU_LINK_AQUI','_blank')">🚀 Quiero acceso anticipado a NEXAFLOW</button>
-    <button class="btn-nueva" onclick="reiniciar()">↩ Generar con otra idea</button>
-  </div>
+  <div class="resultado" id="resultado"></div>
 
 </div>
 
@@ -322,6 +321,7 @@ input:focus, textarea:focus{border-color:#2563EB;}
 const datos = {}
 const total = 8
 let actual = 1
+let resultadoTextoPlano = ''
 
 function buildProgress(){
   const p = document.getElementById('progress')
@@ -360,25 +360,238 @@ const mensajes = [
   'Identificando patrones virales...',
   'Adaptando el tono para tu audiencia...',
   'Construyendo tus ideas...',
+  'Generando el guión...',
+  'Creando prompts de video...',
   'Casi listo...'
 ]
+
+// ─── RENDER: convierte el JSON de 6 capas en HTML legible ───
+function renderResultado(data) {
+  const c1 = data.capa_1_diagnostico
+  const c2 = data.capa_2_ideas
+  const c3 = data.capa_3_seleccion
+  const c4 = data.capa_4_guion
+  const c5 = data.capa_5_prompts_video
+  const c6 = data.capa_6_publicacion
+  const ganadoraId = c3?.id_idea_ganadora
+
+  let html = ''
+
+  // ── CAPA 1: Diagnóstico ──
+  if (c1) {
+    html += `<div class="seccion-titulo">📊 Diagnóstico de tu perfil</div>`
+    html += `<div class="bloque">`
+    if (c1.posicionamiento_unico) {
+      html += `<div class="bloque-titulo"><span>Posicionamiento</span></div>`
+      html += `<p style="font-size:14px;color:#CBD5E1;line-height:1.7;margin-bottom:12px">${c1.posicionamiento_unico}</p>`
+    }
+    if (c1.madurez_del_nicho) {
+      html += `<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">`
+      html += `<span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94A3B8">Madurez del nicho:</span>`
+      html += `<span style="font-size:12px;font-weight:700;color:#60A5FA;background:#1B3A6B;padding:2px 8px;border-radius:6px">${c1.madurez_del_nicho}</span>`
+      html += `</div>`
+    }
+    if (c1.ventana_de_oportunidad) {
+      html += `<div style="background:#1B3A6B20;border-left:3px solid #2563EB;padding:10px 12px;border-radius:0 8px 8px 0;margin-top:8px">`
+      html += `<div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#60A5FA;text-transform:uppercase;margin-bottom:4px">Oportunidad actual</div>`
+      html += `<div style="font-size:13px;color:#CBD5E1;line-height:1.6">${c1.ventana_de_oportunidad}</div>`
+      html += `</div>`
+    }
+    if (c1.riesgos_de_contenido?.length) {
+      html += `<div style="margin-top:12px">`
+      html += `<div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#F87171;text-transform:uppercase;margin-bottom:6px">⚠ Riesgos a evitar</div>`
+      c1.riesgos_de_contenido.forEach(r => {
+        html += `<div style="font-size:12px;color:#94A3B8;padding:4px 0;border-bottom:1px solid #1e3a5f">— ${r}</div>`
+      })
+      html += `</div>`
+    }
+    html += `</div>`
+  }
+
+  // ── CAPA 2: Ideas ──
+  if (c2?.length) {
+    html += `<div class="seccion-titulo">💡 Tus 10 ideas de contenido</div>`
+    html += `<div class="tab-hint">La idea ganadora está marcada en verde</div>`
+    c2.forEach(idea => {
+      const esGanadora = idea.id === ganadoraId
+      const scoreAlto = idea.score_viralidad >= 75
+      html += `<div class="idea-card ${esGanadora?'ganadora':''}">`
+      if (esGanadora) html += `<div class="badge-ganadora">⭐ IDEA GANADORA</div>`
+      html += `<div class="idea-tipo">${idea.tipo} · ${idea.formato_recomendado} · ${idea.duracion_recomendada}</div>`
+      html += `<div class="idea-header">`
+      html += `<div class="idea-titulo">${idea.titulo}</div>`
+      html += `<div class="idea-score ${scoreAlto?'alto':''}">${idea.score_viralidad}/100</div>`
+      html += `</div>`
+      if (idea.hook_apertura) html += `<div class="idea-hook">"${idea.hook_apertura}"</div>`
+      if (idea.emocion_dominante) html += `<div class="idea-emocion">${idea.emocion_dominante}</div>`
+      if (idea.justificacion_viralidad) {
+        html += `<div style="font-size:11px;color:#64748B;margin-top:8px;line-height:1.5">${idea.justificacion_viralidad}</div>`
+      }
+      html += `</div>`
+    })
+
+    // Razón de selección
+    if (c3?.razon_seleccion) {
+      html += `<div class="bloque" style="border-color:#0F766E">`
+      html += `<div class="bloque-titulo"><span>¿Por qué esta idea?</span></div>`
+      html += `<p style="font-size:13px;color:#CBD5E1;line-height:1.7;margin-bottom:8px">${c3.razon_seleccion}</p>`
+      if (c3.factor_decisivo) {
+        html += `<div style="font-size:11px;color:#34D399;font-weight:700">Factor decisivo: ${c3.factor_decisivo}</div>`
+      }
+      html += `</div>`
+    }
+  }
+
+  // ── CAPA 4: Guión ──
+  if (c4) {
+    html += `<div class="seccion-titulo">🎬 Guión completo</div>`
+    html += `<div class="bloque">`
+
+    // Ganchos
+    const ganchos = [c4.gancho_opcion_1, c4.gancho_opcion_2, c4.gancho_opcion_3].filter(Boolean)
+    if (ganchos.length) {
+      html += `<span class="guion-label">Opciones de gancho</span>`
+      ganchos.forEach((g, i) => {
+        const esRecomendado = (i+1) === c4.gancho_recomendado
+        html += `<div class="guion-gancho ${esRecomendado?'recomendado':''}">`
+        if (esRecomendado) html += `<div style="font-size:10px;color:#34D399;font-weight:700;margin-bottom:4px">✓ RECOMENDADO</div>`
+        html += `${g}</div>`
+      })
+      if (c4.razon_gancho_recomendado) {
+        html += `<div style="font-size:11px;color:#64748B;margin-bottom:12px;font-style:italic">${c4.razon_gancho_recomendado}</div>`
+      }
+    }
+
+    // Cuerpo
+    if (c4.cuerpo) {
+      html += `<span class="guion-label">Cuerpo del contenido</span>`
+      html += `<div class="guion-cuerpo">${c4.cuerpo.replace(/\n/g,'<br>')}</div>`
+    }
+
+    // CTA
+    if (c4.cta) {
+      html += `<span class="guion-label">Llamada a la acción</span>`
+      html += `<div class="guion-cta">${c4.cta}</div>`
+    }
+
+    // Meta del guión
+    html += `<div class="guion-meta">`
+    if (c4.palabras_totales_guion) html += `<span class="meta-tag">~${c4.palabras_totales_guion} palabras</span>`
+    if (c4.duracion_estimada_segundos) html += `<span class="meta-tag">~${c4.duracion_estimada_segundos}s</span>`
+    html += `</div>`
+    html += `</div>`
+  }
+
+  // ── CAPA 5: Prompts de video ──
+  if (c5?.clips?.length) {
+    html += `<div class="seccion-titulo">🎥 Prompts para clips de video</div>`
+    if (c5.estilo_visual_global) {
+      html += `<div style="font-size:12px;color:#94A3B8;margin-bottom:10px;line-height:1.6;background:#0f172a;padding:10px;border-radius:8px">`
+      html += `<strong style="color:#60A5FA">Estilo global:</strong> ${c5.estilo_visual_global}`
+      if (c5.paleta_de_color?.length) {
+        html += ` · <strong style="color:#60A5FA">Paleta:</strong> ${c5.paleta_de_color.join(', ')}`
+      }
+      html += `</div>`
+    }
+    c5.clips.forEach(clip => {
+      html += `<div class="clip-card">`
+      html += `<div class="clip-segundos">⏱ ${clip.segundos}</div>`
+      if (clip.frase_del_guion) html += `<div class="clip-frase">"${clip.frase_del_guion}"</div>`
+      if (clip.prompt_imagen) {
+        html += `<span class="clip-prompt-label">🖼 Imagen</span>`
+        html += `<div class="clip-prompt">${clip.prompt_imagen}</div>`
+      }
+      if (clip.prompt_animacion) {
+        html += `<span class="clip-prompt-label">🎞 Animación</span>`
+        html += `<div class="clip-prompt">${clip.prompt_animacion}</div>`
+      }
+      html += `</div>`
+    })
+  }
+
+  // ── CAPA 6: Publicación ──
+  if (c6) {
+    html += `<div class="seccion-titulo">📅 Cuándo publicar</div>`
+    html += `<div class="bloque">`
+    html += `<div class="pub-grid">`
+    if (c6.dia_recomendado) html += `<div class="pub-item"><div class="pub-item-label">Día</div><div class="pub-item-valor">${c6.dia_recomendado}</div></div>`
+    if (c6.hora_recomendada) html += `<div class="pub-item"><div class="pub-item-label">Hora</div><div class="pub-item-valor">${c6.hora_recomendada}</div></div>`
+    if (c6.frecuencia_ideal) html += `<div class="pub-item"><div class="pub-item-label">Frecuencia</div><div class="pub-item-valor">${c6.frecuencia_ideal}</div></div>`
+    if (c6.metrica_principal) html += `<div class="pub-item"><div class="pub-item-label">Métrica clave</div><div class="pub-item-valor" style="font-size:12px">${c6.metrica_principal}</div></div>`
+    html += `</div>`
+    if (c6.razon_timing) {
+      html += `<div style="font-size:12px;color:#94A3B8;line-height:1.6;margin-bottom:10px">${c6.razon_timing}</div>`
+    }
+    if (c6.umbral_de_exito_24h) {
+      html += `<div style="background:#1B3A6B20;border-radius:8px;padding:10px;margin-bottom:8px">`
+      html += `<div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#60A5FA;margin-bottom:4px">Umbral de éxito 24h</div>`
+      html += `<div style="font-size:13px;color:#CBD5E1">${c6.umbral_de_exito_24h}</div>`
+      html += `</div>`
+    }
+    if (c6.accion_si_supera_umbral || c6.accion_si_no_supera_umbral) {
+      html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">`
+      if (c6.accion_si_supera_umbral) {
+        html += `<div style="background:#0d2420;border-radius:8px;padding:10px">`
+        html += `<div style="font-size:10px;font-weight:700;color:#34D399;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">✓ Si supera</div>`
+        html += `<div style="font-size:11px;color:#CBD5E1;line-height:1.5">${c6.accion_si_supera_umbral}</div>`
+        html += `</div>`
+      }
+      if (c6.accion_si_no_supera_umbral) {
+        html += `<div style="background:#2d1515;border-radius:8px;padding:10px">`
+        html += `<div style="font-size:10px;font-weight:700;color:#F87171;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">✗ Si no supera</div>`
+        html += `<div style="font-size:11px;color:#CBD5E1;line-height:1.5">${c6.accion_si_no_supera_umbral}</div>`
+        html += `</div>`
+      }
+      html += `</div>`
+    }
+    if (c6.hashtags_recomendados?.length) {
+      html += `<div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#60A5FA;margin-bottom:6px">Hashtags</div>`
+      html += `<div class="hashtags">`
+      c6.hashtags_recomendados.forEach(h => {
+        html += `<span class="hashtag">${h.startsWith('#')?h:'#'+h}</span>`
+      })
+      html += `</div>`
+    }
+    html += `</div>`
+  }
+
+  // ── BOTONES ──
+  html += `<button class="btn-copiar" onclick="copiarGuion()">📋 Copiar guión completo</button>`
+  html += `<button class="btn-lista" onclick="window.open('https://forms.gle/TU_LINK_AQUI','_blank')">🚀 Quiero acceso anticipado a NEXAFLOW</button>`
+  html += `<button class="btn-nueva" onclick="reiniciar()">↩ Generar con otra idea</button>`
+
+  return html
+}
+
+// ─── Extrae el guión como texto para copiar ───
+function copiarGuion() {
+  if (!resultadoTextoPlano) return
+  navigator.clipboard.writeText(resultadoTextoPlano).then(() => {
+    const btns = document.querySelectorAll('.btn-copiar')
+    btns.forEach(b => {
+      b.textContent = '✅ ¡Copiado!'
+      setTimeout(() => b.textContent = '📋 Copiar guión completo', 2000)
+    })
+  })
+}
 
 async function generar(){
   document.getElementById('p8').classList.remove('activa')
   document.getElementById('cargando').style.display = 'block'
+  document.getElementById('resultado').innerHTML = ''
   document.getElementById('resultado').style.display = 'none'
   buildProgress()
 
   let mi = 0
-  const interval = setInterval(()=>{
-    document.getElementById('msg-carga').textContent = mensajes[mi%mensajes.length]
+  const interval = setInterval(() => {
+    document.getElementById('msg-carga').textContent = mensajes[mi % mensajes.length]
     mi++
-  },2000)
+  }, 2200)
 
-  try{
-    const res = await fetch('/api/diagnostico',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
+  try {
+    const res = await fetch('/api/diagnostico', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         nicho: datos.nicho || '',
         audiencia: datos.audiencia || '',
@@ -390,43 +603,63 @@ async function generar(){
         presencia: datos.presencia || ''
       })
     })
+
     const d = await res.json()
     clearInterval(interval)
     document.getElementById('cargando').style.display = 'none'
-    document.getElementById('resultado').style.display = 'block'
-    if(d.resultado){
-      document.getElementById('texto-resultado').textContent = d.resultado
+    const resultadoDiv = document.getElementById('resultado')
+    resultadoDiv.style.display = 'block'
+
+    if (d.success && d.resultado) {
+      // Guardar texto plano del guión para copiar
+      const c4 = d.resultado.capa_4_guion
+      if (c4) {
+        const ganchoIdx = c4.gancho_recomendado || 1
+        const ganchoTexto = c4[`gancho_opcion_${ganchoIdx}`] || c4.gancho_opcion_1 || ''
+        resultadoTextoPlano = [ganchoTexto, c4.cuerpo, c4.cta].filter(Boolean).join('\n\n')
+      }
+      resultadoDiv.innerHTML = renderResultado(d.resultado)
     } else {
-      document.getElementById('texto-resultado').textContent = 'Error: ' + JSON.stringify(d.error)
+      // Error de la API — mostrar mensaje útil
+      const mensajeError = d.message || d.error || 'Error desconocido'
+      resultadoDiv.innerHTML = `
+        <div class="error-box">
+          <strong>Algo salió mal</strong><br><br>
+          ${mensajeError}<br><br>
+          <small style="color:#94A3B8">Código: ${d.error || res.status}</small>
+        </div>
+        <button class="btn-nueva" onclick="reiniciar()" style="margin-top:12px">↩ Intentar de nuevo</button>
+      `
     }
-  }catch(e){
+  } catch(e) {
     clearInterval(interval)
     document.getElementById('cargando').style.display = 'none'
-    document.getElementById('resultado').style.display = 'block'
-    document.getElementById('texto-resultado').textContent = 'Error de conexión. Intenta de nuevo.'
+    const resultadoDiv = document.getElementById('resultado')
+    resultadoDiv.style.display = 'block'
+    resultadoDiv.innerHTML = `
+      <div class="error-box">
+        <strong>Error de conexión</strong><br><br>
+        No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.<br><br>
+        <small style="color:#94A3B8">${e.message}</small>
+      </div>
+      <button class="btn-nueva" onclick="reiniciar()" style="margin-top:12px">↩ Intentar de nuevo</button>
+    `
   }
 }
 
-function copiar(){
-  const texto = document.getElementById('texto-resultado').textContent
-  navigator.clipboard.writeText(texto).then(()=>{
-    const btn = document.querySelector('.btn-copiar')
-    btn.textContent = '✅ ¡Copiado!'
-    setTimeout(()=>btn.textContent='📋 Copiar todo',2000)
-  })
-}
-
 function reiniciar(){
-  Object.keys(datos).forEach(k=>delete datos[k])
+  Object.keys(datos).forEach(k => delete datos[k])
+  resultadoTextoPlano = ''
   actual = 1
   document.getElementById('resultado').style.display = 'none'
-  document.querySelectorAll('.pregunta').forEach(p=>p.classList.remove('activa'))
-  document.querySelectorAll('.opcion').forEach(b=>b.classList.remove('selected'))
-  document.querySelectorAll('.btn-siguiente').forEach(b=>b.disabled=true)
-  document.getElementById('nicho').value=''
-  document.getElementById('audiencia').value=''
-  document.getElementById('friccion').value=''
-  document.getElementById('tema').value=''
+  document.getElementById('resultado').innerHTML = ''
+  document.querySelectorAll('.pregunta').forEach(p => p.classList.remove('activa'))
+  document.querySelectorAll('.opcion').forEach(b => b.classList.remove('selected'))
+  document.querySelectorAll('.btn-siguiente').forEach(b => b.disabled = true)
+  document.getElementById('nicho').value = ''
+  document.getElementById('audiencia').value = ''
+  document.getElementById('friccion').value = ''
+  document.getElementById('tema').value = ''
   document.getElementById('p1').classList.add('activa')
   buildProgress()
   window.scrollTo({top:0,behavior:'smooth'})
